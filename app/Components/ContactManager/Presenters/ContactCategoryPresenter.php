@@ -1,4 +1,5 @@
 <?php namespace Components\ContactManager\Presenters;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,9 +10,9 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-use Str;
-use Sentry;
 use Robbo\Presenter\Presenter;
+use Sentry;
+use Str;
 
 class ContactCategoryPresenter extends Presenter
 {

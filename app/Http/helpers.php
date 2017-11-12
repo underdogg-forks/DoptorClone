@@ -9,16 +9,15 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-
 /**
  * Get the value of the setting
- * @param  string $key   name of the setting
+ * @param  string $key name of the setting
  * @param  string $default default value
  * @return string
  */
-function get_setting($key, $default='')
+function get_setting($key, $default = '')
 {
-    if(php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
+    if (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR'])) {
         return '';
     }
     if (Schema::hasTable('settings')) {
@@ -43,10 +42,9 @@ function get_setting($key, $default='')
  * @param  string $key
  * @return string
  */
-function theme_setting($key, $default='')
+function theme_setting($key, $default = '')
 {
     $public_theme_id = Setting::value("public_theme", 1);
-
     return ThemeSetting::getSetting($key, $default, $public_theme_id);
 }
 
@@ -89,26 +87,24 @@ function restore_path()
 /**
  * Reference the theme style file
  * @param  string $file
- * @param  array  $attrs
+ * @param  array $attrs
  * @return string
  */
-function theme_css($file='', $attrs=[])
+function theme_css($file = '', $attrs = [])
 {
     $current_theme = current_theme('public');
-
     return HTML::style("assets/public/{$current_theme}/{$file}", $attrs);
 }
 
 /**
  * Reference the theme scripts file
  * @param  string $file
- * @param  array  $attrs
+ * @param  array $attrs
  * @return string
  */
-function theme_js($file='', $attrs=[])
+function theme_js($file = '', $attrs = [])
 {
     $current_theme = current_theme('public');
-
     return HTML::script("assets/public/{$current_theme}/{$file}", $attrs);
 }
 
@@ -117,10 +113,9 @@ function theme_js($file='', $attrs=[])
  * @param  string $file URL for a specific asset file
  * @return string       Full assets URL
  */
-function assets_url($file='')
+function assets_url($file = '')
 {
     $current_theme = current_theme('public');
-
     return url("public/assets/public/{$current_theme}/{$file}");
 }
 
@@ -129,7 +124,7 @@ function assets_url($file='')
  * @param  string $target
  * @return string
  */
-function current_theme($target='public')
+function current_theme($target = 'public')
 {
     return (Schema::hasTable('themes')) ? Theme::find(Setting::value("{$target}_theme", 1))->directory : 'default';
 }
@@ -141,9 +136,7 @@ function current_theme($target='public')
 function has_theme_settings()
 {
     $public_theme_id = Setting::value('public_theme');
-
     $public_theme = Theme::findOrFail($public_theme_id);
-
     return $public_theme->has_settings;
 }
 
@@ -228,22 +221,19 @@ function can_user_access_company($company_id)
  * @param   $menus
  * @return  boolean
  */
-function can_access_menu($user, $menus=array())
+function can_access_menu($user, $menus = array())
 {
     $menus = (array)$menus;
-
     // Get the user permissions
     $permissions = $user->getMergedPermissions();
-
     $access_areas = array();
     foreach ($menus as $menu) {
-        foreach ($permissions as $permission=>$value) {
+        foreach ($permissions as $permission => $value) {
             if (str_contains("{$permission}.", $menu)) {
                 $access_areas[] = $permission;
             }
         }
     }
-
     if ($user->hasAnyAccess($access_areas)) {
         return true;
     } else {
@@ -259,32 +249,27 @@ function timezoneList()
 {
     $timezoneIdentifiers = DateTimeZone::listIdentifiers();
     $utcTime = new DateTime('now', new DateTimeZone('UTC'));
-
     $tempTimezones = array();
     foreach ($timezoneIdentifiers as $timezoneIdentifier) {
         $currentTimezone = new DateTimeZone($timezoneIdentifier);
-
         $tempTimezones[] = array(
-            'offset' => (int)$currentTimezone->getOffset($utcTime),
-            'identifier' => $timezoneIdentifier
+          'offset' => (int)$currentTimezone->getOffset($utcTime),
+          'identifier' => $timezoneIdentifier
         );
     }
-
     // Sort the array by offset,identifier ascending
-    usort($tempTimezones, function($a, $b) {
+    usort($tempTimezones, function ($a, $b) {
         return ($a['offset'] == $b['offset'])
-            ? strcmp($a['identifier'], $b['identifier'])
-            : $a['offset'] - $b['offset'];
+          ? strcmp($a['identifier'], $b['identifier'])
+          : $a['offset'] - $b['offset'];
     });
-
     $timezoneList = array();
     foreach ($tempTimezones as $tz) {
         $sign = ($tz['offset'] > 0) ? '+' : '-';
         $offset = gmdate('H:i', abs($tz['offset']));
         $timezoneList[$tz['identifier']] = '(UTC ' . $sign . $offset . ') ' .
-            $tz['identifier'];
+          $tz['identifier'];
     }
-
     return $timezoneList;
 }
 
@@ -300,55 +285,50 @@ function Zip($source, $destination, $include_dir = true)
     if (!extension_loaded('zip') || !file_exists($source)) {
         return false;
     }
-
     if (file_exists($destination)) {
         unlink($destination);
     }
-
     $zip = new \ZipArchive();
     if (!$zip->open($destination, \ZIPARCHIVE::CREATE)) {
         return false;
     }
-
     $source = str_replace('\\', '/', realpath($source));
     if (is_dir($source) === true) {
-        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source), \RecursiveIteratorIterator::SELF_FIRST);
-
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source),
+          \RecursiveIteratorIterator::SELF_FIRST);
         if ($include_dir) {
             $arr = explode("/", $source);
             $maindir = $arr[count($arr) - 1];
-
             $source = "";
             for ($i = 0; $i < count($arr) - 1; $i++) {
                 $source .= '/' . $arr[$i];
             }
-
             $source = substr($source, 1);
-
             $zip->addEmptyDir($maindir);
         }
-
         foreach ($files as $file) {
             // Ignore "." and ".." folders
-            if (in_array(substr($file, strrpos($file, DIRECTORY_SEPARATOR) + 1), array('.', '..', ':')))
+            if (in_array(substr($file, strrpos($file, DIRECTORY_SEPARATOR) + 1), array('.', '..', ':'))) {
                 continue;
-
+            }
             $file = realpath($file);
             // var_dump($file);
             $file = str_replace('\\', '/', $file);
-
             if (is_dir($file) === true) {
                 $dir = str_replace($source . '/', '', $file . '/');
                 $zip->addEmptyDir($dir);
-            } else if (is_file($file) === true) {
-                $new_file = str_replace($source . '/', '', $file);
-                $zip->addFromString($new_file, file_get_contents($file));
+            } else {
+                if (is_file($file) === true) {
+                    $new_file = str_replace($source . '/', '', $file);
+                    $zip->addFromString($new_file, file_get_contents($file));
+                }
             }
         }
-    } else if (is_file($source) === true) {
-        $zip->addFromString(basename($source), file_get_contents($source));
+    } else {
+        if (is_file($source) === true) {
+            $zip->addFromString(basename($source), file_get_contents($source));
+        }
     }
-
     return $zip->close();
 }
 
@@ -370,7 +350,6 @@ function Unzip($file, $path)
             //skip
         }
         $zip->close();
-
         return true;
     } else {
         return false;

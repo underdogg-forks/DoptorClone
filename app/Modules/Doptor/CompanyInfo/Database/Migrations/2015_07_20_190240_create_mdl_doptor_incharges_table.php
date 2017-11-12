@@ -1,7 +1,6 @@
 <?php
-
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateMdlDoptorInchargesTable extends Migration
 {
@@ -12,7 +11,7 @@ class CreateMdlDoptorInchargesTable extends Migration
      */
     public function up()
     {
-        Schema::create('mdl_doptor_incharges', function(Blueprint $table) {
+        Schema::create('mdl_doptor_incharges', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('address')->nullable();
@@ -24,7 +23,7 @@ class CreateMdlDoptorInchargesTable extends Migration
             $table->string('website')->nullable();
             $table->morphs('inchargable');
             $table->timestamp('created_at')->useCurrent();
-			$table->timestamp('updated_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 

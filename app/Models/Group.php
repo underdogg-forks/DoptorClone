@@ -1,4 +1,5 @@
 <?php
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,34 +10,34 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-class Group extends Eloquent {
-	protected $guarded = array();
 
-	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
-	 */
-	protected $table = 'groups';
-
+class Group extends Eloquent
+{
     public static $rules = array(
-            'name'     => 'alpha_spaces|required|unique:groups,name'
-        );
+      'name' => 'alpha_spaces|required|unique:groups,name'
+    );
+    protected $guarded = array();
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'groups';
 
     /**
      * Validation during create/update of groups
      * @param  array $input Input received from the form
      * @return Validator
      */
-    public static function validate($input, $id=false)
+    public static function validate($input, $id = false)
     {
         if ($id) {
-            static::$rules['name'] .= ','.$id;
+            static::$rules['name'] .= ',' . $id;
         }
         return Validator::make($input, static::$rules);
     }
 
-	/**
+    /**
      * Relation with the menus table
      * A user group can have many menus
      */

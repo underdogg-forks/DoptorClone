@@ -19,7 +19,6 @@ class BuiltModulePresenter extends Presenter
     public function forms()
     {
         $selected_forms = explode(", ", $this->form_id);
-
         $forms = array();
         foreach ($selected_forms as $form_id) {
             $form = BuiltForm::find($form_id);
@@ -27,7 +26,6 @@ class BuiltModulePresenter extends Presenter
                 $forms[] = $form;
             }
         }
-
         return $forms;
     }
 
@@ -38,7 +36,6 @@ class BuiltModulePresenter extends Presenter
     public function selected_forms($index)
     {
         $forms = explode(", ", $this->form_id);
-
         if ($index >= sizeof($forms)) {
             return 0;
         }
@@ -52,11 +49,9 @@ class BuiltModulePresenter extends Presenter
     public function tables()
     {
         $tables = explode('|', $this->table_name);
-
-        $tables = array_map(function($table) {
+        $tables = array_map(function ($table) {
             return 'mdl_' . $table;
         }, $tables);
-
         return implode(', ', $tables);
     }
 }

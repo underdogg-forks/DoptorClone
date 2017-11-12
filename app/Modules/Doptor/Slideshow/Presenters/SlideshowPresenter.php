@@ -1,4 +1,5 @@
 <?php namespace Modules\Doptor\Slideshow\Presenters;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -10,10 +11,8 @@ Description :  Doptor is Opensource CMS.
 ===================================================
 */
 use Str;
-
 use Sentry;
 use Cartalyst\Sentry\Users\UserNotFoundException;
-
 use Robbo\Presenter\Presenter;
 
 class SlideshowPresenter extends Presenter

@@ -1,4 +1,5 @@
 <?php namespace Components\ReportGenerator;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,8 +10,7 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-
-class ReportGeneratorService {
-
+class ReportGeneratorService
+{
 
 }

@@ -1,6 +1,7 @@
 <?php
-
 use Illuminate\Database\Eloquent\Model;
+use Robbo\Presenter\PresentableInterface;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,10 +12,10 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-use Robbo\Presenter\PresentableInterface;
 
-class Module extends Model implements PresentableInterface {
-	/**
+class Module extends Model implements PresentableInterface
+{
+    /**
      * The database table used by the model.
      *
      * @var string
@@ -24,20 +25,20 @@ class Module extends Model implements PresentableInterface {
     protected $guarded = array('id');
 
     public static $rules = array(
-            'name'    => 'alpha_spaces|required|unique:modules,name',
-            'version' => 'required',
-            'author'  => 'required'
-        );
+      'name' => 'alpha_spaces|required|unique:modules,name',
+      'version' => 'required',
+      'author' => 'required'
+    );
 
     /**
      * Validation during create/update of modules
      * @param  array $input Input received from the form
      * @return Validator
      */
-    public static function validate($input, $id=false)
+    public static function validate($input, $id = false)
     {
         if ($id) {
-            static::$rules['name'] .= ','.$id;
+            static::$rules['name'] .= ',' . $id;
         }
         return Validator::make($input, static::$rules);
     }

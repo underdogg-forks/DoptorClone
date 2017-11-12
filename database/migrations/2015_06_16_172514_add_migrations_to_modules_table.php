@@ -1,7 +1,6 @@
 <?php
-
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddMigrationsToModulesTable extends Migration
 {
@@ -12,7 +11,7 @@ class AddMigrationsToModulesTable extends Migration
      */
     public function up()
     {
-        Schema::table('modules', function(Blueprint $table) {
+        Schema::table('modules', function (Blueprint $table) {
             $table->text('migrations')->nullable()->after('links');
         });
     }
@@ -24,7 +23,7 @@ class AddMigrationsToModulesTable extends Migration
      */
     public function down()
     {
-        Schema::table('modules', function(Blueprint $table) {
+        Schema::table('modules', function (Blueprint $table) {
             $table->dropColumn('migrations');
         });
     }

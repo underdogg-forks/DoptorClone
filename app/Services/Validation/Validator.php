@@ -1,4 +1,5 @@
 <?php namespace Services\Validation;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,7 +12,8 @@ Description :  Doptor is Opensource CMS.
 */
 use Validator as V;
 
-abstract class Validator {
+abstract class Validator
+{
 
     /**
      * Perform validation
@@ -22,12 +24,12 @@ abstract class Validator {
      * @return bool
      * @throws ValidationException
      */
-    public function validate($input, $rules, $message=array())
+    public function validate($input, $rules, $message = array())
     {
         $validation = V::make($input, $rules, $message);
-
-        if ($validation->fails()) throw new ValidationException($validation->messages());
-
+        if ($validation->fails()) {
+            throw new ValidationException($validation->messages());
+        }
         return true;
     }
 

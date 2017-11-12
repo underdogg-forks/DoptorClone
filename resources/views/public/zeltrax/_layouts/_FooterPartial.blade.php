@@ -1,23 +1,23 @@
 <div class="footer1">
-    <div class="container">
+  <div class="container">
 
-        {!! Services\MenuManager::generate('public-bottom-menu') !!}
+    {!! Services\MenuManager::generate('public-bottom-menu') !!}
 
-    </div>
+  </div>
 </div><!-- end footer -->
 
 <div class="clearfix"></div>
 
 <div class="copyright_info">
-    <div class="container">
+  <div class="container">
 
-        <div class="one_half">
+    <div class="one_half">
 
-            {!! Setting::value('footer_text') !!}
-
-        </div>
+      {!! Setting::value('footer_text') !!}
 
     </div>
+
+  </div>
 </div><!-- end copyright info -->
 
 

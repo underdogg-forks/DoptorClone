@@ -10,7 +10,7 @@ class SubscriberValidator extends Validator
      * @var array
      */
     protected $rules = array(
-        'email' => 'required|email|unique:newsletter_subscribers,email'
+      'email' => 'required|email|unique:newsletter_subscribers,email'
     );
 
     /**
@@ -18,7 +18,7 @@ class SubscriberValidator extends Validator
      * @var array
      */
     protected $updateRules = array(
-        'email' => 'required|email|unique:newsletter_subscribers,email'
+      'email' => 'required|email|unique:newsletter_subscribers,email'
     );
 
     /**
@@ -26,13 +26,12 @@ class SubscriberValidator extends Validator
      * @var array
      */
     protected $message = array(
-        'email.unique' => 'The email is already subscribed to the newsletter'
+      'email.unique' => 'The email is already subscribed to the newsletter'
     );
 
     public function validateForUpdate($input)
     {
         $this->updateRules['email'] .= ',' . $input['id'];
-
         return $this->validate($input, $this->updateRules, $this->message);
     }
 }

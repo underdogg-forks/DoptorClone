@@ -24,22 +24,24 @@
 <!-- Custom -->
 <script type="text/javascript" src="{!!URL::to("assets/public/default/js/custom.js")!!}"></script>
 <script>
-    // Add CSRF protection tokens in ajax request also
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
+  // Add CSRF protection tokens in ajax request also
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
 
-    $(function () {
-        $("select:not(.select-menu)").chosen();
-    });
+  $(function () {
+    $("select:not(.select-menu)").chosen();
+  });
 </script>
 @if (!Services\MenuManager::isImageShown())
-    <script>
-        $(document).find('img').each(function() { $(this).remove() })
-    </script>
+  <script>
+    $(document).find('img').each(function () {
+      $(this).remove()
+    })
+  </script>
 @endif
 @section('scripts')
-    {{-- Here goes the page level scripts and plugins --}}
+  {{-- Here goes the page level scripts and plugins --}}
 @show

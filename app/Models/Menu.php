@@ -9,66 +9,37 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-use Robbo\Presenter\PresentableInterface;
 use Carbon\Carbon;
+use Robbo\Presenter\PresentableInterface;
 
-class Menu extends Eloquent implements PresentableInterface {
+class Menu extends Eloquent implements PresentableInterface
+{
+    public static $accessible = array('order', 'title', 'link', 'parent', 'category', 'position');
+    public static $rules = array(
+      'title' => 'alpha_spaces|required',
+      'alias' => 'required|alpha_dash|unique:menus,alias',
+      'parent' => 'required|integer',
+      'link' => 'required',
+      'order' => 'integer',
+      'position' => 'required|not_in:0',
+      'wrapper_width' => 'integer',
+      'wrapper_height' => 'integer'
+    );
+
+    // Path in the public folder to upload menu icon
     /**
      * The database table used by the model.
      *
      * @var string
      */
     protected $table = 'menus';
-
-    public static $accessible = array('order', 'title', 'link', 'parent', 'category', 'position');
-
-    // Path in the public folder to upload menu icon
     protected $images_path = 'uploads/menus/';
+    protected $guarded = array('access_groups');
 
-	protected $guarded = array('access_groups');
-
-	public static $rules = array(
-            'title'          => 'alpha_spaces|required',
-            'alias'          => 'required|alpha_dash|unique:menus,alias',
-            'parent'         => 'required|integer',
-            'link'           => 'required',
-            'order'          => 'integer',
-            'position'       => 'required|not_in:0',
-            'wrapper_width'  => 'integer',
-            'wrapper_height' => 'integer'
-        );
-
-    /**
-     * Relation with the menu categories table
-     * A menu can have only one menu category
-     */
-    public function cat()
-    {
-         return $this->belongsTo('MenuCategory', 'category', 'id');
-    }
-
-    /**
-     * Relation with the menu positions table
-     * A menu can have only one menu position
-     */
-    public function pos()
-    {
-         return $this->belongsTo('MenuPosition', 'position', 'id');
-    }
-
-    /**
-     * Relation with groups table
-     * A menu can be assigned to different user groups
-     */
-    public function groups()
-    {
-        return $this->belongsToMany('Group');
-    }
-
-    public static function validate($input, $id=false)
+    public static function validate($input, $id = false)
     {
         if ($id) {
-            static::$rules['alias'] .= ','.$id;
+            static::$rules['alias'] .= ',' . $id;
         }
         return Validator::make($input, static::$rules);
     }
@@ -80,10 +51,146 @@ class Menu extends Eloquent implements PresentableInterface {
     public static function all_targets()
     {
         return array(
-                'public'  => 'Public',
-                'admin'   => 'Admin',
-                'backend' => 'Backend'
+          'public' => 'Public',
+          'admin' => 'Admin',
+          'backend' => 'Backend'
+        );
+    }
+
+    /**
+     * Get all the statuses available for a menu
+     * @return array
+     */
+    public static function all_status()
+    {
+        return array(
+          'published' => 'Publish',
+          'unpublished' => 'Unpublish',
+          'draft' => 'Draft'
+        );
+    }
+
+    public static function menu_name($id)
+    {
+        if ($id == 0) {
+            return '-- None --';
+        } else {
+            $menu = Menu::find($id);
+            if ($menu) {
+                return $menu->title;
+            } else {
+                return '-- None --';
+            }
+        }
+    }
+
+    /**
+     * The list that is displayed while selecting item for menu
+     * @param  boolean $allow_none Whether to display None value for user to select or not
+     * @return array
+     */
+    public static function menu_lists($allow_none = false)
+    {
+        $modules = array();
+        foreach (Module::all(array('name', 'links')) as $module) {
+            if ($module->links != '') {
+                $links = json_decode($module->links);
+                foreach ($links as $link) {
+                    $modules['link_type/modules/' . $link->alias] = $link->name;
+                }
+            } else {
+                $modules['link_type/modules/' . Str::slug($module->name, '_')] = $module->name;
+            }
+        }
+        $pages = array();
+        foreach (Post::type('page')->get(array('title', 'permalink')) as $page) {
+            $pages['pages/' . $page->permalink] = $page->title;
+        }
+        $post_categories = array();
+        foreach (Category::type('post')->get(array('name', 'alias')) as $page_category) {
+            $post_categories['posts/category/' . $page_category->alias] = $page_category->name;
+        }
+        $contacts = array();
+        foreach (Components\ContactManager\Models\ContactDetail::get(array('name', 'alias')) as $contact) {
+            $contacts['contact/show/' . $contact->alias] = $contact->name;
+        }
+        $contact_categories = array();
+        foreach (Components\ContactManager\Models\ContactCategory::get(array('name', 'alias')) as $contact_cat) {
+            $contact_categories['contact/' . $contact_cat->alias] = $contact_cat->name;
+        }
+        $forms = array();
+        foreach (BuiltForm::get(array('name', 'id')) as $contact_cat) {
+            $forms['link_type/form/' . $contact_cat->id] = $contact_cat->name;
+        }
+        $report_generators = array();
+        foreach (Components\ReportGenerator\Models\ReportGenerator::get(array('name', 'id')) as $report_generator) {
+            $report_generators['admin/report-generators/generate/' . $report_generator->id] = $report_generator->name;
+        }
+        $menu_list = [
+          '/' => 'Home',
+          'Pages' => $pages,
+          'posts' => 'Posts',
+          'Post Categories' => $post_categories,
+          'Modules' => $modules,
+          'Contact Categories' => $contact_categories,
+          'Contacts' => $contacts,
+          'Forms' => $forms,
+          'Report Generators' => $report_generators,
+          'manual' => 'External link'
+        ];
+        if ($allow_none) {
+            $menu_list[0] = 'None';
+            ksort($menu_list);
+        }
+        return $menu_list;
+    }
+
+    public static function menu_entries($id = 0)
+    {
+        $all_menus = array(0 => 'None');
+        $menu_entries = Menu::with('cat')->get();
+        foreach ($menu_entries as $menu_entry) {
+            if ($menu_entry->id == $id) {
+                continue;
+            }
+            $menu = array(
+              $menu_entry->id => $menu_entry->title
             );
+            if ($menu_entry->cat) {
+                $cat_name = $menu_entry->cat->name;
+                $all_menus[$cat_name][$menu_entry->id] = $menu_entry->title;
+            } else {
+                $all_menus[$menu_entry->id] = $menu_entry->title;
+            }
+        }
+        return $all_menus;
+    }
+
+    /**
+     * Relation with the menu categories table
+     * A menu can have only one menu category
+     */
+    public function cat()
+    {
+        return $this->belongsTo('MenuCategory', 'category', 'id');
+    }
+
+    /**
+     * Relation with the menu positions table
+     * A menu can have only one menu position
+     */
+    public function pos()
+    {
+        return $this->belongsTo('MenuPosition', 'position', 'id');
+    }
+
+    /**
+     * Relation with groups table
+     * A menu can be assigned to different user groups
+     */
+    public function groups()
+    {
+        return $this->belongsToMany('Group');
     }
 
     /**
@@ -93,33 +200,22 @@ class Menu extends Eloquent implements PresentableInterface {
     public function scopePublished($query)
     {
         return $query->where('status', '=', 'published')
-                        ->where(function($query) {
-                            $query->where('publish_start', '<', Carbon::now())
-                                    ->orWhere('publish_start', '=', '0000-00-00 00:00:00')
-                                    ->orWhereNull('publish_start');
-                        })
-                        ->where(function($query) {
-                            $query->where('publish_end', '>', Carbon::now())
-                                    ->orWhere('publish_end', '=', '0000-00-00 00:00:00')
-                                    ->orWhereNull('publish_end');
-                        });
+          ->where(function ($query) {
+              $query->where('publish_start', '<', Carbon::now())
+                ->orWhere('publish_start', '=', '0000-00-00 00:00:00')
+                ->orWhereNull('publish_start');
+          })
+          ->where(function ($query) {
+              $query->where('publish_end', '>', Carbon::now())
+                ->orWhere('publish_end', '=', '0000-00-00 00:00:00')
+                ->orWhereNull('publish_end');
+          });
     }
 
     public function scopeDefault($query, $target)
     {
         return $query->where('target', $target)
-                ->where('is_default', true);
-    }
-
-    /**
-     * Get the icon with its directory location
-     * @return string
-     */
-    public function getIconAttribute()
-    {
-        if ($this->attributes['icon']) {
-            return $this->attributes['icon'];
-        }
+          ->where('is_default', true);
     }
 
     /**
@@ -133,25 +229,31 @@ class Menu extends Eloquent implements PresentableInterface {
             if (Input::hasFile('icon')) {
                 File::exists(public_path() . '/uploads/') || File::makeDirectory(public_path() . '/uploads/');
                 File::exists(public_path() . '/' . $this->images_path) || File::makeDirectory(public_path() . '/' . $this->images_path);
-
                 $file_name = $file->getClientOriginalName();
                 $image = Image::make($file->getRealPath());
-
                 if (isset($this->attributes['icon'])) {
                     // Delete old image
                     $old_image = $this->getIconAttribute();
                     File::exists($old_image) && File::delete($old_image);
                 }
-
                 $image->fit(32, 32)
-                        ->save($this->images_path . $file_name);
-
+                  ->save($this->images_path . $file_name);
                 $file_name = $this->images_path . $file_name;
             } else {
                 $file_name = $file;
             }
-
             $this->attributes['icon'] = $file_name;
+        }
+    }
+
+    /**
+     * Get the icon with its directory location
+     * @return string
+     */
+    public function getIconAttribute()
+    {
+        if ($this->attributes['icon']) {
+            return $this->attributes['icon'];
         }
     }
 
@@ -211,7 +313,6 @@ class Menu extends Eloquent implements PresentableInterface {
             }
         } else {
             list($link_type, $link, $layout) = current_section();
-
             $this->link = str_replace('link_type/', $link, $this->link);
             return $this->link;
         }
@@ -230,11 +331,9 @@ class Menu extends Eloquent implements PresentableInterface {
                 case '/':
                     $link = 'Home';
                     break;
-
                 case 'posts':
                     $link = 'Posts';
                     break;
-
                 default:
                     $link = str_replace('link_type/', '', $this->link);
                     break;
@@ -244,130 +343,10 @@ class Menu extends Eloquent implements PresentableInterface {
     }
 
     /**
-     * Get all the statuses available for a menu
-     * @return array
-     */
-    public static function all_status()
-    {
-        return array(
-                'published'   => 'Publish',
-                'unpublished' => 'Unpublish',
-                'draft'       => 'Draft'
-            );
-    }
-
-    public static function menu_name($id)
-    {
-        if ($id == 0) {
-            return '-- None --';
-        } else {
-            $menu = Menu::find($id);
-            if ($menu) {
-                return $menu->title;
-            } else {
-                return '-- None --';
-            }
-        }
-    }
-
-    /**
-     * The list that is displayed while selecting item for menu
-     * @param  boolean $allow_none Whether to display None value for user to select or not
-     * @return array
-     */
-    public static function menu_lists($allow_none=false)
-    {
-        $modules = array();
-
-        foreach (Module::all(array('name', 'links')) as $module) {
-            if ($module->links != '') {
-                $links = json_decode($module->links);
-                foreach ($links as $link) {
-                    $modules['link_type/modules/' . $link->alias] = $link->name;
-                }
-            } else {
-                $modules['link_type/modules/' . Str::slug($module->name, '_')] = $module->name;
-            }
-        }
-
-        $pages = array();
-        foreach (Post::type('page')->get(array('title', 'permalink')) as $page) {
-            $pages['pages/' . $page->permalink] = $page->title;
-        }
-
-        $post_categories = array();
-        foreach (Category::type('post')->get(array('name', 'alias')) as $page_category) {
-            $post_categories['posts/category/' . $page_category->alias] = $page_category->name;
-        }
-
-        $contacts = array();
-        foreach (Components\ContactManager\Models\ContactDetail::get(array('name', 'alias')) as $contact) {
-            $contacts['contact/show/' . $contact->alias] = $contact->name;
-        }
-
-        $contact_categories = array();
-        foreach (Components\ContactManager\Models\ContactCategory::get(array('name', 'alias')) as $contact_cat) {
-            $contact_categories['contact/' . $contact_cat->alias] = $contact_cat->name;
-        }
-
-        $forms = array();
-        foreach (BuiltForm::get(array('name', 'id')) as $contact_cat) {
-            $forms['link_type/form/' . $contact_cat->id] = $contact_cat->name;
-        }
-
-        $report_generators = array();
-        foreach (Components\ReportGenerator\Models\ReportGenerator::get(array('name', 'id')) as $report_generator) {
-            $report_generators['admin/report-generators/generate/' . $report_generator->id] = $report_generator->name;
-        }
-
-        $menu_list = [
-                    '/'                  => 'Home',
-                    'Pages'              => $pages,
-                    'posts'              => 'Posts',
-                    'Post Categories'    => $post_categories,
-                    'Modules'            => $modules,
-                    'Contact Categories' => $contact_categories,
-                    'Contacts'           => $contacts,
-                    'Forms'              => $forms,
-                    'Report Generators'  => $report_generators,
-                    'manual'             => 'External link'
-                ];
-
-        if ($allow_none) {
-            $menu_list[0] = 'None';
-            ksort($menu_list);
-        }
-
-        return $menu_list;
-    }
-
-    public static function menu_entries($id=0)
-    {
-        $all_menus = array(0=>'None');
-        $menu_entries = Menu::with('cat')->get();
-
-        foreach ($menu_entries as $menu_entry) {
-            if ($menu_entry->id == $id) continue;
-            $menu = array(
-                    $menu_entry->id => $menu_entry->title
-                );
-
-            if ($menu_entry->cat) {
-                $cat_name = $menu_entry->cat->name;
-                $all_menus[$cat_name][$menu_entry->id] = $menu_entry->title;
-            } else {
-                $all_menus[$menu_entry->id] = $menu_entry->title;
-            }
-        }
-
-        return $all_menus;
-    }
-
-    /**
      * Get all the groups that a menu lies in
      * @return string
      */
-    public function selected_groups($field='id')
+    public function selected_groups($field = 'id')
     {
         $ret = array();
         foreach ($this->groups as $group) {

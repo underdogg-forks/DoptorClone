@@ -1,4 +1,5 @@
 <?php
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,20 +10,29 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-class MenuPosition extends Eloquent {
-	/**
+
+class MenuPosition extends Eloquent
+{
+    public static $rules = array(
+      'name' => 'alpha_spaces|required|unique:menu_positions,name',
+      'alias' => 'unique:menu_positions,alias',
+    );
+    /**
      * The database table used by the model.
      *
      * @var string
      */
     protected $table = 'menu_positions';
-
     protected $guarded = array('id');
 
-    public static $rules = array(
-            'name'  => 'alpha_spaces|required|unique:menu_positions,name',
-            'alias' => 'unique:menu_positions,alias',
-        );
+    public static function validate($input, $id = false)
+    {
+        if ($id) {
+            static::$rules['name'] .= ',' . $id;
+            static::$rules['alias'] .= ',' . $id;
+        }
+        return Validator::make($input, static::$rules);
+    }
 
     /**
      * Relation with menus table
@@ -30,15 +40,6 @@ class MenuPosition extends Eloquent {
     public function menus()
     {
         return $this->hasMany('Menu', 'position');
-    }
-
-    public static function validate($input, $id=false)
-    {
-        if ($id) {
-            static::$rules['name']  .= ','.$id;
-            static::$rules['alias'] .= ','.$id;
-        }
-        return Validator::make($input, static::$rules);
     }
 
     /**
@@ -50,13 +51,12 @@ class MenuPosition extends Eloquent {
         if ($alias == '') {
             $alias = Str::slug($this->attributes['name']);
             $aliases = $this->whereRaw("alias REGEXP '^{$alias}(-[0-9]*)?$'");
-
             if ($aliases->count() === 0) {
                 $this->attributes['alias'] = $alias;
             } else {
                 // get reverse order and get first
-                $lastAliasNumber = intval(str_replace($alias . '-', '', $aliases->orderBy('alias', 'desc')->first()->alias));
-
+                $lastAliasNumber = intval(str_replace($alias . '-', '',
+                  $aliases->orderBy('alias', 'desc')->first()->alias));
                 $this->attributes['alias'] = $alias . '-' . ($lastAliasNumber + 1);
             }
         } else {

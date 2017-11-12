@@ -22,5 +22,5 @@
 {{-- <link href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'> --}}
 
 @section('styles')
-    {{-- Here goes the page level styles --}}
+  {{-- Here goes the page level styles --}}
 @show

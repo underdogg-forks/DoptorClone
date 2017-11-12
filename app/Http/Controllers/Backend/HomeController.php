@@ -1,4 +1,5 @@
 <?php namespace Backend;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -14,15 +15,14 @@ use Input;
 use Redirect;
 use Request;
 use View;
-
 use MenuPosition;
 use Setting;
 use Theme;
 use ThemeSetting;
-
 use Modules\Doptor\TranslationManager\Models\TranslationLanguage;
 
-class HomeController extends AdminController {
+class HomeController extends AdminController
+{
 
     /**
      * Index page of backend dashboard
@@ -33,21 +33,19 @@ class HomeController extends AdminController {
         $this->layout->title = trans('cms.home');
         if ($this->link_type == 'admin') {
             $position = MenuPosition::where('alias', '=', 'admin-main-menu')
-                                    ->with('menus')
-                                    ->first();
-
+              ->with('menus')
+              ->first();
             $menu_items = $position->menus()
-                            ->published()
-                            ->where('parent', '=', 0)
-                            ->orderBy('order', 'asc')
-                            ->get();
-
-            $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.index')
-                                            ->with('menu_items', $menu_items)
-                                            ->with('title', trans('cms.home'));
+              ->published()
+              ->where('parent', '=', 0)
+              ->orderBy('order', 'asc')
+              ->get();
+            $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.index')
+              ->with('menu_items', $menu_items)
+              ->with('title', trans('cms.home'));
         } else {
-            $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.index')
-            ->with('title', trans('cms.home'));
+            $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.index')
+              ->with('title', trans('cms.home'));
         }
     }
 
@@ -58,34 +56,32 @@ class HomeController extends AdminController {
     public function getConfig()
     {
         $languages = TranslationLanguage::lists('name', 'code');
-
-        if (!$this->user->hasAnyAccess(array('config.create', 'config.update'))) App::abort('401');
-
+        if (!$this->user->hasAnyAccess(array('config.create', 'config.update'))) {
+            App::abort('401');
+        }
         $this->layout->title = 'Website Configuration';
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.config')
-                                        ->with('languages', $languages);
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.config')
+          ->with('languages', $languages);
     }
 
     public function postConfig()
     {
-        if (!$this->user->hasAnyAccess(array('config.create', 'config.update'))) App::abort('401');
+        if (!$this->user->hasAnyAccess(array('config.create', 'config.update'))) {
+            App::abort('401');
+        }
         $input = Input::all();
-
         unset($input['_token']);
-
         $disabled_ips = explode(' ', $input['disabled_ips']);
         if (in_array(Request::getClientIp(), $disabled_ips)) {
             return Redirect::back()
-                            ->withInput()
-                            ->with('error_message', trans('error_messages.cant_disable_ip'));
+              ->withInput()
+              ->with('error_message', trans('error_messages.cant_disable_ip'));
         }
-
         foreach ($input as $name => $value) {
             Setting::findOrCreate($name, $value);
         }
-
         return Redirect::back()
-                            ->with('success_message', trans('success_messages.config_change'));
+          ->with('success_message', trans('success_messages.config_change'));
     }
 
     /**
@@ -95,11 +91,8 @@ class HomeController extends AdminController {
     public function getThemeConfig()
     {
         $public_theme_id = Setting::value('public_theme');
-
         $public_theme = Theme::findOrFail($public_theme_id);
-
-        $theme_config_view = 'public.'.$public_theme->directory.'.theme-settings';
-
+        $theme_config_view = 'public.' . $public_theme->directory . '.theme-settings';
         if (View::exists($theme_config_view)) {
             $this->layout->title = 'Theme Settings';
             $this->layout->content = View::make($theme_config_view);
@@ -114,19 +107,17 @@ class HomeController extends AdminController {
      */
     public function postThemeConfig()
     {
-        if (!$this->user->hasAnyAccess(array('config.create', 'config.update'))) App::abort('401');
+        if (!$this->user->hasAnyAccess(array('config.create', 'config.update'))) {
+            App::abort('401');
+        }
         $input = Input::all();
-
         unset($input['_token']);
-
         $public_theme_id = Setting::value('public_theme');
-
         foreach ($input as $name => $value) {
             ThemeSetting::saveSetting($name, $value, $public_theme_id);
         }
-
         return Redirect::back()
-                            ->with('success_message', trans('success_messages.config_change'));
+          ->with('success_message', trans('success_messages.config_change'));
     }
 
     /**
@@ -137,9 +128,8 @@ class HomeController extends AdminController {
     public function getChangeLang($lang)
     {
         \Session::put('language', $lang);
-
         return Redirect::to($this->link_type)
-                            ->with('success_message', 'The language was changed.');
+          ->with('success_message', 'The language was changed.');
     }
 
     /**
@@ -148,8 +138,7 @@ class HomeController extends AdminController {
      */
     public function getDatatableLangfile()
     {
-        $translation= \Lang::get('datatable');
-
+        $translation = \Lang::get('datatable');
         return json_encode($translation);
     }
 }

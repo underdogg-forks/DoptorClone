@@ -12,8 +12,9 @@ Description :  Doptor is Opensource CMS.
 use Robbo\Presenter\PresentableInterface;
 use Services\Validation\ValidationException as ValidationException;
 
-class FormEntry extends Eloquent implements PresentableInterface {
-	protected $fillable = array('form_id', 'fields', 'data');
+class FormEntry extends Eloquent implements PresentableInterface
+{
+    protected $fillable = array('form_id', 'fields', 'data');
 
     protected $guarded = array('id');
 
@@ -23,23 +24,17 @@ class FormEntry extends Eloquent implements PresentableInterface {
     {
         // dd($attributes);
         static::isValid($attributes);
-
         if (isset($attributes['captcha'])) {
             // Do not save the value of captcha to database
             unset($attributes['captcha']);
         }
         unset($attributes['_token']);
-
         $entry['form_id'] = $attributes['form_id'];
         unset($attributes['form_id']);
-
         $form = BuiltForm::findOrFail($entry['form_id']);
-
         $module_builder = new Services\ModuleBuilder;
         $form_fields = $module_builder->getFormFields($form->data);
-
         $fields = array_combine($form_fields['fields'], $form_fields['field_names']);
-
         $entry['data'] = json_encode($attributes);
         $entry['fields'] = json_encode($fields);
         // dd($entry);
@@ -49,18 +44,15 @@ class FormEntry extends Eloquent implements PresentableInterface {
     public static function isValid($attributes)
     {
         $rules = array();
-
         $messages = array();
-
         if (isset($attributes['captcha'])) {
             $rules['captcha'] = 'required|captcha';
             $messages['captcha.captcha'] = 'Incorrect captcha';
         }
-
         $validation = Validator::make($attributes, $rules, $messages);
-
-        if ($validation->fails()) throw new ValidationException($validation->messages());
-
+        if ($validation->fails()) {
+            throw new ValidationException($validation->messages());
+        }
         return true;
     }
 

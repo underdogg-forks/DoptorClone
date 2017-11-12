@@ -11,31 +11,21 @@ Description :  Doptor is Opensource CMS.
 */
 use Robbo\Presenter\PresentableInterface;
 
-class Category extends Eloquent implements PresentableInterface {
-    protected $table = 'categories';
-
-	protected $guarded = array('id');
+class Category extends Eloquent implements PresentableInterface
+{
     public static $rules = array();
-
-    /**
-     * Relation with posts table
-     */
-    public function posts()
-    {
-        return $this->belongsToMany('Post');
-    }
+    protected $table = 'categories';
+    protected $guarded = array('id');
 
     /**
      * Get all available categories
      */
-    public static function all_categories($type='post')
+    public static function all_categories($type = 'post')
     {
         $categories = array();
-
         foreach (Category::type($type)->get() as $category) {
             $categories[$category->id] = $category->name;
         }
-
         return $categories;
     }
 
@@ -48,8 +38,29 @@ class Category extends Eloquent implements PresentableInterface {
     {
         App::make('Components\\Posts\\Validation\\CategoryValidator')->validateForCreation($attributes);
         $attributes['created_by'] = current_user()->id;
-
         return parent::create($attributes);
+    }
+
+    /**
+     * Get all the statuses available for a post
+     * @return array
+     */
+    public static function all_status()
+    {
+        return array(
+          'published' => 'Publish',
+          'unpublished' => 'Unpublish',
+          'drafted' => 'Draft',
+          'archived' => 'Archive'
+        );
+    }
+
+    /**
+     * Relation with posts table
+     */
+    public function posts()
+    {
+        return $this->belongsToMany('Post');
     }
 
     /**
@@ -61,7 +72,6 @@ class Category extends Eloquent implements PresentableInterface {
     {
         App::make('Components\\Posts\\Validation\\CategoryValidator')->validateForUpdate($attributes);
         $attributes['updated_by'] = current_user()->id;
-
         return parent::update($attributes);
     }
 
@@ -73,7 +83,6 @@ class Category extends Eloquent implements PresentableInterface {
     {
         if ($alias == '') {
             $this->attributes['alias'] = Str::slug($this->attributes['name'], '-');
-
             if (Category::where('alias', '=', $this->attributes['alias'])->first()) {
                 $this->attributes['alias'] = Str::slug($this->attributes['name'], '-') . '-1';
             }
@@ -95,23 +104,9 @@ class Category extends Eloquent implements PresentableInterface {
      * @param  string $type
      * @return query
      */
-    public function scopeType($query, $type='post')
+    public function scopeType($query, $type = 'post')
     {
         return $query->where('type', '=', $type);
-    }
-
-    /**
-     * Get all the statuses available for a post
-     * @return array
-     */
-    public static function all_status()
-    {
-        return array(
-                'published'   => 'Publish',
-                'unpublished' => 'Unpublish',
-                'drafted'     => 'Draft',
-                'archived'    => 'Archive'
-            );
     }
 
     /**

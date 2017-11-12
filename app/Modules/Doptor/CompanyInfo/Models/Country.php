@@ -1,4 +1,5 @@
 <?php namespace Modules\Doptor\CompanyInfo\Models;
+
 /*
 =================================================
 Module Name     :   Company Info
@@ -10,10 +11,10 @@ Description     :
 */
 use Eloquent;
 use Validator;
-
 use Services\Validation\ValidationException as ValidationException;
 
-class Country extends Eloquent {
+class Country extends Eloquent
+{
 
     protected $table = 'mdl_doptor_countries';
 
@@ -22,7 +23,6 @@ class Country extends Eloquent {
         $countries = static::lists('name', 'id')->all();
         $countries[0] = 'Select Country';
         ksort($countries);
-
         return $countries;
     }
 }

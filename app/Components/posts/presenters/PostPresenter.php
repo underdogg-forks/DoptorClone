@@ -17,7 +17,7 @@ class PostPresenter extends Presenter
      * Get the page's excerpt
      * @return string
      */
-    public function excerpt($length=80)
+    public function excerpt($length = 80)
     {
         if (strpos($this->content, '<!--more-->')) {
             list($excerpt, $more) = explode('<!--more-->', $this->content);
@@ -34,7 +34,7 @@ class PostPresenter extends Presenter
      * Get the creation date of the page
      * @return string
      */
-    public function date($format='')
+    public function date($format = '')
     {
         return $this->created_at->format('d') . '<br>' . $this->created_at->format('M') . '<br>' . $this->created_at->format('Y');
     }
@@ -43,7 +43,7 @@ class PostPresenter extends Presenter
      * Get all the categories that a post lies in
      * @return string
      */
-    public function selected_categories($field='id')
+    public function selected_categories($field = 'id')
     {
         $ret = array();
         foreach ($this->categories as $category) {

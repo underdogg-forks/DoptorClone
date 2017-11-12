@@ -1,4 +1,5 @@
 <?php namespace Backend;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,7 +10,8 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-class FormBuilderController extends AdminController {
+class FormBuilderController extends AdminController
+{
 
     /**
      * Display a listing of the form.
@@ -19,8 +21,8 @@ class FormBuilderController extends AdminController {
     {
         $forms = \BuiltForm::with('cat')->latest()->get();
         $this->layout->title = 'All Built Forms';
-        $this->layout->content = \View::make($this->link_type.'.'.$this->current_theme.'.formbuilders.index')
-                                        ->with('forms', $forms);
+        $this->layout->content = \View::make($this->link_type . '.' . $this->current_theme . '.formbuilders.index')
+          ->with('forms', $forms);
     }
 
     /**
@@ -30,7 +32,7 @@ class FormBuilderController extends AdminController {
     public function create()
     {
         $this->layout->title = 'Create New Form';
-        $this->layout->content = \View::make($this->link_type.'.'.$this->current_theme.'.formbuilders.create_edit');
+        $this->layout->content = \View::make($this->link_type . '.' . $this->current_theme . '.formbuilders.create_edit');
     }
 
     /**
@@ -42,74 +44,71 @@ class FormBuilderController extends AdminController {
         try {
             $input = \Input::all();
             $input['show_captcha'] = isset($input['show_captcha']);
-
             $validator = \BuiltForm::validate($input);
-
             if ($validator->passes()) {
-                $form = \BuiltForm::create (array(
-                    'name'         => $input['name'],
-                    'hash'         => uniqid('form_'),
-                    'category'     => $input['category'],
-                    'description'  => $input['description'],
-                    'show_captcha' => $input['show_captcha'],
-                    'data'         => $input['data'],
-                    'redirect_to'  => $input['redirect_to'],
-                    'extra_code'   => base64_decode($input['extra_code']),
-                    'email'        => $input['email'],
-                    'rendered'     => base64_decode($input['rendered'])
+                $form = \BuiltForm::create(array(
+                  'name' => $input['name'],
+                  'hash' => uniqid('form_'),
+                  'category' => $input['category'],
+                  'description' => $input['description'],
+                  'show_captcha' => $input['show_captcha'],
+                  'data' => $input['data'],
+                  'redirect_to' => $input['redirect_to'],
+                  'extra_code' => base64_decode($input['extra_code']),
+                  'email' => $input['email'],
+                  'rendered' => base64_decode($input['rendered'])
                 ));
-
                 if ($form) {
                     return \Redirect::to('backend/form-builder')
-                                        ->with('success_message', trans('success_messages.form_create'));
+                      ->with('success_message', trans('success_messages.form_create'));
                 } else {
                     return \Redirect::to('backend/form-builder')
-                                        ->with('error_message', trans('error_messages.form_create'));
+                      ->with('error_message', trans('error_messages.form_create'));
                 }
             } else {
                 // Form validation failed
                 return \Redirect::back()
-                                    ->withInput()
-                                    ->withErrors($validator);
+                  ->withInput()
+                  ->withErrors($validator);
             }
         } catch (\Exception $e) {
             return \Redirect::back()
-                                ->with('error_message', trans('error_messages.form_create'));
+              ->with('error_message', trans('error_messages.form_create'));
         }
     }
 
     /**
      * Display the specified form.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function show($id)
     {
         $form = \BuiltForm::findOrFail($id);
         $this->layout->title = $form->name;
-        $this->layout->content = \View::make($this->link_type.'.'.$this->current_theme.'.formbuilders.show')
-                                        ->with('form', $form);
+        $this->layout->content = \View::make($this->link_type . '.' . $this->current_theme . '.formbuilders.show')
+          ->with('form', $form);
     }
 
     /**
      * Show the form for editing the specified form.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function edit($id)
     {
         $form = \BuiltForm::findOrFail($id);
         $this->layout->title = 'Edit Form';
-        $this->layout->content = \View::make($this->link_type.'.'.$this->current_theme.'.formbuilders.create_edit')
-                                        ->with('form', $form);
+        $this->layout->content = \View::make($this->link_type . '.' . $this->current_theme . '.formbuilders.create_edit')
+          ->with('form', $form);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function update($id)
@@ -117,65 +116,60 @@ class FormBuilderController extends AdminController {
         try {
             $input = \Input::all();
             $input['show_captcha'] = isset($input['show_captcha']);
-
             $validator = \BuiltForm::validate($input, $id);
-
             if ($validator->passes()) {
                 $form = \BuiltForm::findOrFail($id);
-
-                $form->name         = $input['name'];
+                $form->name = $input['name'];
                 if ($form->hash == '') {
                     $form->hash = uniqid('form_');
                 }
-                $form->category     = $input['category'];
+                $form->category = $input['category'];
                 $form->show_captcha = $input['show_captcha'];
-                $form->description  = $input['description'];
-                $form->data         = $input['data'];
-                $form->redirect_to  = $input['redirect_to'];
-                $form->extra_code   = base64_decode($input['extra_code']);
-                $form->email        = $input['email'];
-                $form->rendered     = base64_decode($input['rendered']);
-
+                $form->description = $input['description'];
+                $form->data = $input['data'];
+                $form->redirect_to = $input['redirect_to'];
+                $form->extra_code = base64_decode($input['extra_code']);
+                $form->email = $input['email'];
+                $form->rendered = base64_decode($input['rendered']);
                 if ($form->save()) {
                     return \Redirect::to('backend/form-builder')
-                                        ->with('success_message', trans('success_messages.form_update'));
+                      ->with('success_message', trans('success_messages.form_update'));
                 } else {
                     return \Redirect::to('backend/form-builder')
-                                        ->with('error_message', trans('error_messages.form_cat_update'));
+                      ->with('error_message', trans('error_messages.form_cat_update'));
                 }
             } else {
                 // Form validation failed
                 return \Redirect::back()
-                                    ->withInput()
-                                    ->withErrors($validator);
+                  ->withInput()
+                  ->withErrors($validator);
             }
         } catch (\Exception $e) {
             dd($e->getMessage());
             return \Redirect::back()
-                                ->with('error_message', trans('error_messages.form_cat_update'));
+              ->with('error_message', trans('error_messages.form_cat_update'));
         }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function destroy($id)
     {
         $form = \BuiltForm::findOrFail($id);
-
         if (\BuiltModule::where('form_id', '=', $id)->first()) {
             return \Redirect::back()
-                            ->with('error_message', trans('error_messages.form_delete_assoc'));
+              ->with('error_message', trans('error_messages.form_delete_assoc'));
         }
         if ($form->delete()) {
             return \Redirect::to('backend/form-builder')
-                                ->with('success_message', trans('success_messages.form_delete'));
+              ->with('success_message', trans('success_messages.form_delete'));
         } else {
             return \Redirect::to('backend/form-builder')
-                                ->with('error_message', trans('error_messages.form_delete'));
+              ->with('error_message', trans('error_messages.form_delete'));
         }
     }
 

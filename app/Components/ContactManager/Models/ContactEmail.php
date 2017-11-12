@@ -1,4 +1,5 @@
 <?php namespace Components\ContactManager\Models;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -12,7 +13,8 @@ Description :  Doptor is Opensource CMS.
 use Eloquent;
 use Str;
 
-class ContactEmail extends Eloquent {
+class ContactEmail extends Eloquent
+{
 
     protected $table = 'contact_emails';
 

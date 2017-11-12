@@ -1,7 +1,6 @@
 <?php
-
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateTranslationLanguagesTable extends Migration
 {
@@ -17,7 +16,7 @@ class CreateTranslationLanguagesTable extends Migration
             $table->string('name');
             $table->string('code');
             $table->timestamp('created_at')->useCurrent();
-			$table->timestamp('updated_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 

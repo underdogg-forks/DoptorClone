@@ -1,4 +1,5 @@
 <?php namespace Modules\Doptor\TranslationManager\Validation;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,15 +12,16 @@ Description :  Doptor is Opensource CMS.
 */
 use Services\Validation\Validator as Validator;
 
-class LanguageValidator extends Validator {
+class LanguageValidator extends Validator
+{
 
     /**
      * Default rules
      * @var array
      */
     protected $rules = array(
-        'name' => 'required',
-        'code' => 'required|alpha_dash'
+      'name' => 'required',
+      'code' => 'required|alpha_dash'
     );
 
     /**
@@ -27,14 +29,13 @@ class LanguageValidator extends Validator {
      * @var array
      */
     protected $updateRules = array(
-        'name' => 'required',
-        'code' => 'required|alpha_dash'
+      'name' => 'required',
+      'code' => 'required|alpha_dash'
     );
 
     /**
      * Messages for validation
      * @var array
      */
-    protected $message = array(
-    );
+    protected $message = array();
 }

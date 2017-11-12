@@ -1,4 +1,5 @@
 <?php namespace Components\ContactManager\Models;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -12,11 +13,11 @@ Description :  Doptor is Opensource CMS.
 use App;
 use Eloquent;
 use Str;
-
 use Components\ContactManager\Presenters\ContactCategoryPresenter;
 use Robbo\Presenter\PresentableInterface;
 
-class ContactCategory extends Eloquent implements PresentableInterface {
+class ContactCategory extends Eloquent implements PresentableInterface
+{
     protected $table = 'contact_categories';
 
     protected $guarded = array('id');
@@ -39,7 +40,6 @@ class ContactCategory extends Eloquent implements PresentableInterface {
     {
         App::make('Components\\ContactManager\\Validation\\ContactCategoryValidator')->validateForCreation($attributes);
         $attributes['created_by'] = current_user()->id;
-
         return parent::create($attributes);
     }
 
@@ -52,7 +52,6 @@ class ContactCategory extends Eloquent implements PresentableInterface {
     {
         App::make('Components\\ContactManager\\Validation\\ContactCategoryValidator')->validateForUpdate($attributes);
         $attributes['updated_by'] = current_user()->id;
-
         return parent::update($attributes);
     }
 
@@ -65,13 +64,12 @@ class ContactCategory extends Eloquent implements PresentableInterface {
         if ($alias == '') {
             $alias = Str::slug($this->attributes['name']);
             $aliases = $this->whereRaw("alias REGEXP '^{$alias}(-[0-9]*)?$'");
-
             if ($aliases->count() === 0) {
                 $this->attributes['alias'] = $alias;
             } else {
                 // get reverse order and get first
-                $lastAliasNumber = intval(str_replace($alias . '-', '', $aliases->orderBy('alias', 'desc')->first()->alias));
-
+                $lastAliasNumber = intval(str_replace($alias . '-', '',
+                  $aliases->orderBy('alias', 'desc')->first()->alias));
                 $this->attributes['alias'] = $alias . '-' . ($lastAliasNumber + 1);
             }
         } else {
@@ -95,11 +93,11 @@ class ContactCategory extends Eloquent implements PresentableInterface {
     public static function all_status()
     {
         return array(
-                'published'   => 'Publish',
-                'unpublished' => 'Unpublish',
-                'drafted'     => 'Draft',
-                'archived'    => 'Archive'
-            );
+          'published' => 'Publish',
+          'unpublished' => 'Unpublish',
+          'drafted' => 'Draft',
+          'archived' => 'Archive'
+        );
     }
 
     /**

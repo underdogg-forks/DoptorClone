@@ -14,5 +14,4 @@ use Robbo\Presenter\Presenter;
 class MenuCategoryPresenter extends Presenter
 {
 
-
 }

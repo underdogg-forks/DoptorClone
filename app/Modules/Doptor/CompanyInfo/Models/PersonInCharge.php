@@ -1,4 +1,5 @@
 <?php namespace Modules\Doptor\CompanyInfo\Models;
+
 /*
 =================================================
 Module Name     :   Company Info
@@ -10,10 +11,10 @@ Description     :
 */
 use Eloquent;
 use Validator;
-
 use Services\Validation\ValidationException as ValidationException;
 
-class PersonInCharge extends Eloquent {
+class PersonInCharge extends Eloquent
+{
 
     protected $table = 'mdl_doptor_incharges';
 
@@ -38,33 +39,32 @@ class PersonInCharge extends Eloquent {
     public static function boot()
     {
         parent::boot();
-
-        static::creating(function($entry) {
-            if (!$entry->isValid()) return false;
+        static::creating(function ($entry) {
+            if (!$entry->isValid()) {
+                return false;
+            }
         });
-
-        static::updating(function($entry) {
-            if (!$entry->isValid()) return false;
+        static::updating(function ($entry) {
+            if (!$entry->isValid()) {
+                return false;
+            }
         });
     }
 
     public function isValid()
     {
         $entry = $this->toArray();
-
         $rules = [
-            'name' => 'required',
-            'country_id' => 'not_in:0'
+          'name' => 'required',
+          'country_id' => 'not_in:0'
         ];
-
         $messages = [
-            'country_id.not_in' => 'Select a country'
+          'country_id.not_in' => 'Select a country'
         ];
-
         $validation = Validator::make($entry, $rules, $messages);
-
-        if ($validation->fails()) throw new ValidationException($validation->messages());
-
+        if ($validation->fails()) {
+            throw new ValidationException($validation->messages());
+        }
         return true;
     }
 

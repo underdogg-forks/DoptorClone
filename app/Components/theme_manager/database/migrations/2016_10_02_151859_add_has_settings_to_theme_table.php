@@ -1,7 +1,6 @@
 <?php
-
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddHasSettingsToThemeTable extends Migration
 {
@@ -12,7 +11,7 @@ class AddHasSettingsToThemeTable extends Migration
      */
     public function up()
     {
-        Schema::table('themes', function(Blueprint $table) {
+        Schema::table('themes', function (Blueprint $table) {
             $table->boolean('has_settings')->default(false)->after('target');
         });
     }
@@ -24,7 +23,7 @@ class AddHasSettingsToThemeTable extends Migration
      */
     public function down()
     {
-        Schema::table('themes', function(Blueprint $table) {
+        Schema::table('themes', function (Blueprint $table) {
             $table->dropColumn('has_settings');
         });
     }

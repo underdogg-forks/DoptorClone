@@ -1,4 +1,5 @@
 <?php namespace Modules\Doptor\Slideshow\Models;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -13,13 +14,12 @@ use App;
 use Eloquent;
 use File;
 use Input;
-
 use Image;
 use Robbo\Presenter\PresentableInterface;
-
 use Modules\Doptor\Slideshow\Presenters\SlideshowPresenter;
 
-class Slideshow extends Eloquent implements PresentableInterface {
+class Slideshow extends Eloquent implements PresentableInterface
+{
     protected $table = 'slideshow';
 
     // Path in the public folder to upload slides
@@ -36,7 +36,6 @@ class Slideshow extends Eloquent implements PresentableInterface {
     public static function create(array $attributes = array())
     {
         App::make('Modules\\Doptor\\Slideshow\\Validation\\SlideshowValidator')->validateForCreation($attributes);
-
         parent::create($attributes);
     }
 
@@ -48,7 +47,6 @@ class Slideshow extends Eloquent implements PresentableInterface {
     public function update(array $attributes = array(), array $options = array())
     {
         App::make('Modules\\Doptor\\Slideshow\\Validation\\SlideshowValidator')->validateForUpdate($attributes);
-
         parent::update($attributes);
     }
 
@@ -82,25 +80,19 @@ class Slideshow extends Eloquent implements PresentableInterface {
                 // If an actual file is selected
                 File::exists(public_path() . '/uploads/') || File::makeDirectory(public_path() . '/uploads/');
                 File::exists(public_path() . '/' . $this->images_path) || File::makeDirectory(public_path() . '/' . $this->images_path);
-
                 $file_name = $file->getClientOriginalName();
                 $image = Image::make($file->getRealPath());
-
                 if (isset($this->attributes['image'])) {
                     // Delete old image
                     $old_image = $this->getIconAttribute();
                     File::exists($old_image) && File::delete($old_image);
                 }
-
                 $image->save($this->images_path . $file_name);
-
                 $file_name = $this->images_path . $file_name;
             } else {
-
                 $file_name = $file;
 
             }
-
             $this->attributes['image'] = $file_name;
         }
     }
@@ -114,7 +106,6 @@ class Slideshow extends Eloquent implements PresentableInterface {
             return $this->link_manual;
         } else {
             list($link_type, $link, $layout) = current_section();
-
             $this->link = str_replace('link_type/', $link, $this->link);
             return $this->link;
         }
@@ -127,11 +118,11 @@ class Slideshow extends Eloquent implements PresentableInterface {
     public static function all_status()
     {
         return array(
-                'published'   => 'Publish',
-                'unpublished' => 'Unpublish',
-                'drafted'     => 'Draft',
-                'archived'    => 'Archive'
-            );
+          'published' => 'Publish',
+          'unpublished' => 'Unpublish',
+          'drafted' => 'Draft',
+          'archived' => 'Archive'
+        );
     }
 
     /**

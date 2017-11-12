@@ -1,4 +1,5 @@
 <?php namespace Backend;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,15 +10,14 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-
 use App, Exception, Input, Redirect, View;
 use Sentry;
-
 use Services\UserManager;
 use Services\UserGroupManager;
 use User;
 
-class UserController extends AdminController {
+class UserController extends AdminController
+{
 
     protected $user_manager;
     protected $usergroup_manager;
@@ -26,7 +26,6 @@ class UserController extends AdminController {
     {
         $this->user_manager = $user_manager;
         $this->usergroup_manager = $usergroup_manager;
-
         parent::__construct();
     }
 
@@ -39,8 +38,8 @@ class UserController extends AdminController {
         $users = $this->user_manager->findAllUsers();
         // dd($users);
         $this->layout->title = 'All Users';
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.users.index')
-                                    ->with('users', $users);
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.users.index')
+          ->with('users', $users);
     }
 
     /**
@@ -50,16 +49,14 @@ class UserController extends AdminController {
     public function create()
     {
         $company_module = 'Modules\Doptor\CompanyInfo\Models\Company';
-
         if (class_exists($company_module)) {
             $companies = $company_module::names();
         } else {
             $companies = null;
         }
-
         $this->layout->title = 'Create New User';
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.users.create_edit')
-                                        ->with('companies', $companies);
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.users.create_edit')
+          ->with('companies', $companies);
     }
 
     /**
@@ -70,75 +67,69 @@ class UserController extends AdminController {
     {
         try {
             $input = Input::all();
-
             $validator = User::validate_registration($input);
-
             if ($validator->passes()) {
                 // Create user and add to selected user group
                 $user = $this->user_manager->createUser($input);
-
                 if ($input['status'] == 1) {
                     $this->user_manager->activateUser($user->id);
                 } else {
                     $this->user_manager->deactivateUser($user->id);
                 }
-
                 return Redirect::back()
-                                ->with('success_message', trans('success_messages.user_create', ['username' => $input['username']]));
+                  ->with('success_message', trans('success_messages.user_create', ['username' => $input['username']]));
             } else {
                 // Form validation failed
                 return Redirect::back()
-                                    ->withInput()
-                                    ->withErrors($validator);
+                  ->withInput()
+                  ->withErrors($validator);
             }
         } catch (Exception $e) {
             return Redirect::back()
-                                ->with('error_message', trans('error_messages.user_create', ['username' => $input['username']]) . $e->getMessage());
+              ->with('error_message',
+                trans('error_messages.user_create', ['username' => $input['username']]) . $e->getMessage());
         }
     }
 
     /**
      * Display the specified user.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function show($id)
     {
         $user = Sentry::findUserById($id);
-
         $this->layout->title = 'User Information';
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.users.show')
-                                        ->with('user', $user);
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.users.show')
+          ->with('user', $user);
     }
 
     /**
      * Show the form for editing the specified user.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function edit($id)
     {
         $company_module = 'Modules\Doptor\CompanyInfo\Models\Company';
-
         if (class_exists($company_module)) {
             $companies = $company_module::names();
         } else {
             $companies = null;
         }
-
         $user = $this->user_manager->findUserById($id);
         $this->layout->title = 'Edit User';
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.users.create_edit')
-                                        ->with('user', $user)
-                                        ->with('companies', $companies);
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.users.create_edit')
+          ->with('user', $user)
+          ->with('companies', $companies);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function update($id)
@@ -146,21 +137,18 @@ class UserController extends AdminController {
         if (!($this->user->hasAccess('users.edit') || Sentry::getUser()->id == $id)) {
             App::abort('401');
         }
-
         try {
-            if (current_user()->id != $id ) {
+            if (current_user()->id != $id) {
                 $redirect_to = $this->link_type . '/users';
             } else {
                 // Redirect users without user editing privilege to their profile
                 $redirect_to = $this->link_type . '/profile';
             }
             $input = Input::all();
-
             $validator = User::validate_change($input, $id);
             if ($validator->passes()) {
                 // Update the current user
                 $this->user_manager->updateUser($id, $input);
-
                 if (isset($input['status'])) {
                     // Don not change the user status during profile update
                     if ($input['status'] == 1) {
@@ -169,62 +157,60 @@ class UserController extends AdminController {
                         $this->user_manager->deactivateUser($id);
                     }
                 }
-
                 return Redirect::to($redirect_to)
-                    ->with('success_message', trans('success_messages.user_update', ['username' => $input['username']]));
+                  ->with('success_message', trans('success_messages.user_update', ['username' => $input['username']]));
 
             } else {
                 // Form validation failed
                 return Redirect::back()
-                                    ->withInput()
-                                    ->withErrors($validator);
+                  ->withInput()
+                  ->withErrors($validator);
             }
         } catch (Exception $e) {
             return Redirect::to($redirect_to)
-                                ->with('error_message', trans('error_messages.user_update', ['username' => $input['username']]) . $e->getMessage());
+              ->with('error_message',
+                trans('error_messages.user_update', ['username' => $input['username']]) . $e->getMessage());
         }
     }
 
     public function getChangePassword()
     {
         $this->layout->title = 'Change User Password';
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.users.change_pw');
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.users.change_pw');
     }
 
     public function putChangePassword()
     {
         $input = Input::all();
-
         $validator = User::validate_pw_change($input);
         if ($validator->passes()) {
             $user = current_user();
             $user->password = $input['password'];
             $user->last_pw_changed = date('Y-m-d h:i:s');
             $user->save();
-
             return Redirect::to($this->link_type)
-                ->with('success_message', "The user password was updated.");
+              ->with('success_message', "The user password was updated.");
 
         } else {
             // Form validation failed
             return Redirect::back()
-                                ->withInput()
-                                ->withErrors($validator);
+              ->withInput()
+              ->withErrors($validator);
         }
     }
+
     /**
      * Remove the specified user.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
-    public function destroy($id=null)
+    public function destroy($id = null)
     {
         try {
             $message = $this->user_manager->deleteUser($id);
-
             return Redirect::to("{$this->link_type}/users")
-                ->with('success_message', $message);
+              ->with('success_message', $message);
         } catch (Exception $e) {
             return Redirect::back()->withInput()->with('error_message', $e->getMessage());
         }
@@ -240,9 +226,8 @@ class UserController extends AdminController {
     {
         try {
             $this->user_manager->activateUser($id);
-
             return Redirect::to("{$this->link_type}/users")
-                ->with('success_message', trans('success_messages.user_activate'));
+              ->with('success_message', trans('success_messages.user_activate'));
         } catch (Exception $e) {
             return Redirect::back()->withInput()->with('error_message', $e->getMessage());
         }
@@ -258,9 +243,8 @@ class UserController extends AdminController {
     {
         try {
             $this->user_manager->deactivateUser($id);
-
             return Redirect::to("{$this->link_type}/users")
-                ->with('success_message', trans('success_messages.user_deactivate'));
+              ->with('success_message', trans('success_messages.user_deactivate'));
         } catch (Exception $e) {
             return Redirect::back()->withInput()->with('error_message', $e->getMessage());
         }

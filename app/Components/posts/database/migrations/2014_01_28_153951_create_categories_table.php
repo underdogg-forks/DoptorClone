@@ -1,9 +1,9 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateCategoriesTable extends Migration {
+class CreateCategoriesTable extends Migration
+{
 
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreateCategoriesTable extends Migration {
      */
     public function up()
     {
-        Schema::create('categories', function(Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('alias');
@@ -20,20 +20,16 @@ class CreateCategoriesTable extends Migration {
             // $table->integer('language_id')->unsigned();
             $table->text('description')->nullable();
             $table->string('status', 20)->default('published');
-
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamp('created_at')->useCurrent();
-			$table->timestamp('updated_at')->nullable();
-
+            $table->timestamp('updated_at')->nullable();
             $table->index('created_by');
             $table->foreign('created_by')->references('id')->on('users')->on_delete('restrict')->on_update('cascade');
-
             $table->index('updated_by');
             $table->foreign('updated_by')->references('id')->on('users')->on_delete('restrict')->on_update('cascade');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,4 +1,5 @@
 <?php namespace Components\ContactManager\Models;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,16 +12,33 @@ Description :  Doptor is Opensource CMS.
 */
 use Eloquent;
 use Str;
-
 use Components\ContactManager\Presenters\ContactPresenter;
 use Robbo\Presenter\PresentableInterface;
 
-class ContactDetail extends Eloquent implements PresentableInterface {
+class ContactDetail extends Eloquent implements PresentableInterface
+{
 
-	protected $table = 'contact_details';
+    protected $table = 'contact_details';
 
-	protected $fillable = array('name', 'alias', 'image', 'email', 'address', 'city', 'state', 'zip_code', 'category_id', 'country', 'telephone', 'mobile', 'fax', 'website', 'display_options', 'location');
-	protected $guarded = array('id');
+    protected $fillable = array(
+      'name',
+      'alias',
+      'image',
+      'email',
+      'address',
+      'city',
+      'state',
+      'zip_code',
+      'category_id',
+      'country',
+      'telephone',
+      'mobile',
+      'fax',
+      'website',
+      'display_options',
+      'location'
+    );
+    protected $guarded = array('id');
 
     public function emails()
     {
@@ -41,13 +59,12 @@ class ContactDetail extends Eloquent implements PresentableInterface {
         if ($alias == '') {
             $alias = Str::slug($this->attributes['name']);
             $aliases = $this->whereRaw("alias REGEXP '^{$alias}(-[0-9]*)?$'");
-
             if ($aliases->count() === 0) {
                 $this->attributes['alias'] = $alias;
             } else {
                 // get reverse order and get first
-                $lastAliasNumber = intval(str_replace($alias . '-', '', $aliases->orderBy('alias', 'desc')->first()->alias));
-
+                $lastAliasNumber = intval(str_replace($alias . '-', '',
+                  $aliases->orderBy('alias', 'desc')->first()->alias));
                 $this->attributes['alias'] = $alias . '-' . ($lastAliasNumber + 1);
             }
         } else {

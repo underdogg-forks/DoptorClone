@@ -2,7 +2,8 @@
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
-class Kernel extends HttpKernel {
+class Kernel extends HttpKernel
+{
 
     /**
      * The application's global HTTP middleware stack.
@@ -10,12 +11,12 @@ class Kernel extends HttpKernel {
      * @var array
      */
     protected $middleware = [
-        'Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode',
-        'Illuminate\Cookie\Middleware\EncryptCookies',
-        'Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse',
-        'Illuminate\Session\Middleware\StartSession',
-        'Illuminate\View\Middleware\ShareErrorsFromSession',
-        'App\Http\Middleware\VerifyCsrfToken',
+      'Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode',
+      'Illuminate\Cookie\Middleware\EncryptCookies',
+      'Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse',
+      'Illuminate\Session\Middleware\StartSession',
+      'Illuminate\View\Middleware\ShareErrorsFromSession',
+      'App\Http\Middleware\VerifyCsrfToken',
     ];
 
     /**
@@ -24,14 +25,13 @@ class Kernel extends HttpKernel {
      * @var array
      */
     protected $routeMiddleware = [
-        'auth' => 'App\Http\Middleware\Authenticate',
-        'auth.backend' => 'App\Http\Middleware\AuthenticateBackend',
-        'auth.permissions' => 'App\Http\Middleware\IsAuthorized',
-        'auth.pw_6_months' => 'App\Http\Middleware\IsStalePassword',
-        'auth.basic' => 'Illuminate\Auth\Middleware\AuthenticateWithBasicAuth',
-        'guest' => 'App\Http\Middleware\RedirectIfAuthenticated',
-
-        'isInstalled' => 'App\Http\Middleware\IsInstalled',
+      'auth' => 'App\Http\Middleware\Authenticate',
+      'auth.backend' => 'App\Http\Middleware\AuthenticateBackend',
+      'auth.permissions' => 'App\Http\Middleware\IsAuthorized',
+      'auth.pw_6_months' => 'App\Http\Middleware\IsStalePassword',
+      'auth.basic' => 'Illuminate\Auth\Middleware\AuthenticateWithBasicAuth',
+      'guest' => 'App\Http\Middleware\RedirectIfAuthenticated',
+      'isInstalled' => 'App\Http\Middleware\IsInstalled',
     ];
 
 }

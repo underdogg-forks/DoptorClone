@@ -1,29 +1,28 @@
 <?php
-
 use Illuminate\Database\Seeder;
 
-class BuiltFormsTableSeeder extends Seeder {
+class BuiltFormsTableSeeder extends Seeder
+{
 
-	/**
-	 * Auto generated seed file
-	 *
-	 * @return void
-	 */
-	public function run()
-	{
-		\DB::table('built_forms')->delete();
-        
-		\DB::table('built_forms')->insert(array (
-			0 => 
-			array (
-				'id' => '8',
-				'name' => 'Client Data',
-				'hash' => '',
-				'category' => '1',
-				'description' => '',
-				'show_captcha' => '0',
-				'data' => '[{"title":"Form Name","fields":{"name":{"label":"Form Name","type":"input","value":"Client Data","name":"name"}}},{"title":"Text Input","fields":{"id":{"label":"ID / Name","type":"input","value":"client32nn","name":"id"},"label":{"label":"Label Text","type":"input","value":"Client Name","name":"label"},"placeholder":{"label":"Placeholder","type":"input","value":"","name":"placeholder"},"helptext":{"label":"Help Text","type":"input","value":"","name":"helptext"},"required":{"label":"Required","type":"checkbox","value":false,"name":"required"},"inputsize":{"label":"Input Size","type":"select","value":[{"value":"input-mini","selected":false,"label":"Mini"},{"value":"input-small","selected":false,"label":"Small"},{"value":"input-medium","selected":false,"label":"Medium"},{"value":"input-large","selected":false,"label":"Large"},{"value":"input-xlarge","selected":true,"label":"Xlarge"},{"value":"input-xxlarge","selected":false,"label":"Xxlarge"}],"name":"inputsize"}}},{"title":"Text Area","fields":{"id":{"label":"ID / Name","type":"input","value":"clientaddress9mm","name":"id"},"label":{"label":"Label Text","type":"input","value":"Address","name":"label"},"textarea":{"label":"Starting Text","type":"textarea","value":"","name":"textarea"}}},{"title":"Text Input","fields":{"id":{"label":"ID / Name","type":"input","value":"phone8089","name":"id"},"label":{"label":"Label Text","type":"input","value":"Phone","name":"label"},"placeholder":{"label":"Placeholder","type":"input","value":"","name":"placeholder"},"helptext":{"label":"Help Text","type":"input","value":"","name":"helptext"},"required":{"label":"Required","type":"checkbox","value":false,"name":"required"},"inputsize":{"label":"Input Size","type":"select","value":[{"value":"input-mini","selected":false,"label":"Mini"},{"value":"input-small","selected":false,"label":"Small"},{"value":"input-medium","selected":false,"label":"Medium"},{"value":"input-large","selected":false,"label":"Large"},{"value":"input-xlarge","selected":true,"label":"Xlarge"},{"value":"input-xxlarge","selected":false,"label":"Xxlarge"}],"name":"inputsize"}}},{"title":"Text Input","fields":{"id":{"label":"ID / Name","type":"input","value":"email232","name":"id"},"label":{"label":"Label Text","type":"input","value":"Email ","name":"label"},"placeholder":{"label":"Placeholder","type":"input","value":"","name":"placeholder"},"helptext":{"label":"Help Text","type":"input","value":"","name":"helptext"},"required":{"label":"Required","type":"checkbox","value":false,"name":"required"},"inputsize":{"label":"Input Size","type":"select","value":[{"value":"input-mini","selected":false,"label":"Mini"},{"value":"input-small","selected":false,"label":"Small"},{"value":"input-medium","selected":false,"label":"Medium"},{"value":"input-large","selected":false,"label":"Large"},{"value":"input-xlarge","selected":true,"label":"Xlarge"},{"value":"input-xxlarge","selected":false,"label":"Xxlarge"}],"name":"inputsize"}}},{"title":"Text Input","fields":{"id":{"label":"ID / Name","type":"input","value":"website9808","name":"id"},"label":{"label":"Label Text","type":"input","value":"Website","name":"label"},"placeholder":{"label":"Placeholder","type":"input","value":"","name":"placeholder"},"helptext":{"label":"Help Text","type":"input","value":"","name":"helptext"},"required":{"label":"Required","type":"checkbox","value":false,"name":"required"},"inputsize":{"label":"Input Size","type":"select","value":[{"value":"input-mini","selected":false,"label":"Mini"},{"value":"input-small","selected":false,"label":"Small"},{"value":"input-medium","selected":false,"label":"Medium"},{"value":"input-large","selected":false,"label":"Large"},{"value":"input-xlarge","selected":true,"label":"Xlarge"},{"value":"input-xxlarge","selected":false,"label":"Xxlarge"}],"name":"inputsize"}}},{"title":"Select Basic","fields":{"id":{"label":"ID / Name","type":"input","value":"country009ms","name":"id"},"label":{"label":"Label Text","type":"input","value":"Country","name":"label"},"options":{"label":"Options","type":"textarea-split","value":["Bangladesh","Malaysia","Singapore","USA","Canada","Australia","UK","Japan"],"name":"options"},"inputsize":{"label":"Input Size","type":"select","value":[{"value":"input-mini","selected":false,"label":"Mini"},{"value":"input-small","selected":false,"label":"Small"},{"value":"input-medium","selected":false,"label":"Medium"},{"value":"input-large","selected":false,"label":"Large"},{"value":"input-xlarge","selected":true,"label":"Xlarge"},{"value":"input-xxlarge","selected":false,"label":"Xxlarge"}],"name":"inputsize"}}},{"title":"Multiple Radios","fields":{"name":{"label":"Group Name","type":"input","value":"status98nm","name":"name"},"label":{"label":"Label Text","type":"input","value":"Status","name":"label"},"required":{"label":"Required","type":"checkbox","value":false,"name":"required"},"radios":{"label":"Radios","type":"textarea-split","value":["Active","Inactive"],"name":"radios"}}},{"title":"Single Button","fields":{"id":{"label":"ID / Name","type":"input","value":"singlebutton44d","name":"id"},"label":{"label":"Label Text","type":"input","value":"","name":"label"},"buttonlabel":{"label":"Button Label","type":"input","value":"Submit","name":"buttonlabel"},"buttontype":{"label":"Button Type","type":"select","value":[{"value":"btn-default","selected":false,"label":"Default"},{"value":"btn-primary","selected":true,"label":"Primary"},{"value":"btn-info","selected":false,"label":"Info"},{"value":"btn-success","selected":false,"label":"Success"},{"value":"btn-warning","selected":false,"label":"Warning"},{"value":"btn-danger","selected":false,"label":"Danger"},{"value":"btn-inverse","selected":false,"label":"Inverse"}],"name":"buttontype"}}}]',
-				'rendered' => '<form class="form-horizontal">
+    /**
+     * Auto generated seed file
+     *
+     * @return void
+     */
+    public function run()
+    {
+        \DB::table('built_forms')->delete();
+        \DB::table('built_forms')->insert(array(
+          0 =>
+            array(
+              'id' => '8',
+              'name' => 'Client Data',
+              'hash' => '',
+              'category' => '1',
+              'description' => '',
+              'show_captcha' => '0',
+              'data' => '[{"title":"Form Name","fields":{"name":{"label":"Form Name","type":"input","value":"Client Data","name":"name"}}},{"title":"Text Input","fields":{"id":{"label":"ID / Name","type":"input","value":"client32nn","name":"id"},"label":{"label":"Label Text","type":"input","value":"Client Name","name":"label"},"placeholder":{"label":"Placeholder","type":"input","value":"","name":"placeholder"},"helptext":{"label":"Help Text","type":"input","value":"","name":"helptext"},"required":{"label":"Required","type":"checkbox","value":false,"name":"required"},"inputsize":{"label":"Input Size","type":"select","value":[{"value":"input-mini","selected":false,"label":"Mini"},{"value":"input-small","selected":false,"label":"Small"},{"value":"input-medium","selected":false,"label":"Medium"},{"value":"input-large","selected":false,"label":"Large"},{"value":"input-xlarge","selected":true,"label":"Xlarge"},{"value":"input-xxlarge","selected":false,"label":"Xxlarge"}],"name":"inputsize"}}},{"title":"Text Area","fields":{"id":{"label":"ID / Name","type":"input","value":"clientaddress9mm","name":"id"},"label":{"label":"Label Text","type":"input","value":"Address","name":"label"},"textarea":{"label":"Starting Text","type":"textarea","value":"","name":"textarea"}}},{"title":"Text Input","fields":{"id":{"label":"ID / Name","type":"input","value":"phone8089","name":"id"},"label":{"label":"Label Text","type":"input","value":"Phone","name":"label"},"placeholder":{"label":"Placeholder","type":"input","value":"","name":"placeholder"},"helptext":{"label":"Help Text","type":"input","value":"","name":"helptext"},"required":{"label":"Required","type":"checkbox","value":false,"name":"required"},"inputsize":{"label":"Input Size","type":"select","value":[{"value":"input-mini","selected":false,"label":"Mini"},{"value":"input-small","selected":false,"label":"Small"},{"value":"input-medium","selected":false,"label":"Medium"},{"value":"input-large","selected":false,"label":"Large"},{"value":"input-xlarge","selected":true,"label":"Xlarge"},{"value":"input-xxlarge","selected":false,"label":"Xxlarge"}],"name":"inputsize"}}},{"title":"Text Input","fields":{"id":{"label":"ID / Name","type":"input","value":"email232","name":"id"},"label":{"label":"Label Text","type":"input","value":"Email ","name":"label"},"placeholder":{"label":"Placeholder","type":"input","value":"","name":"placeholder"},"helptext":{"label":"Help Text","type":"input","value":"","name":"helptext"},"required":{"label":"Required","type":"checkbox","value":false,"name":"required"},"inputsize":{"label":"Input Size","type":"select","value":[{"value":"input-mini","selected":false,"label":"Mini"},{"value":"input-small","selected":false,"label":"Small"},{"value":"input-medium","selected":false,"label":"Medium"},{"value":"input-large","selected":false,"label":"Large"},{"value":"input-xlarge","selected":true,"label":"Xlarge"},{"value":"input-xxlarge","selected":false,"label":"Xxlarge"}],"name":"inputsize"}}},{"title":"Text Input","fields":{"id":{"label":"ID / Name","type":"input","value":"website9808","name":"id"},"label":{"label":"Label Text","type":"input","value":"Website","name":"label"},"placeholder":{"label":"Placeholder","type":"input","value":"","name":"placeholder"},"helptext":{"label":"Help Text","type":"input","value":"","name":"helptext"},"required":{"label":"Required","type":"checkbox","value":false,"name":"required"},"inputsize":{"label":"Input Size","type":"select","value":[{"value":"input-mini","selected":false,"label":"Mini"},{"value":"input-small","selected":false,"label":"Small"},{"value":"input-medium","selected":false,"label":"Medium"},{"value":"input-large","selected":false,"label":"Large"},{"value":"input-xlarge","selected":true,"label":"Xlarge"},{"value":"input-xxlarge","selected":false,"label":"Xxlarge"}],"name":"inputsize"}}},{"title":"Select Basic","fields":{"id":{"label":"ID / Name","type":"input","value":"country009ms","name":"id"},"label":{"label":"Label Text","type":"input","value":"Country","name":"label"},"options":{"label":"Options","type":"textarea-split","value":["Bangladesh","Malaysia","Singapore","USA","Canada","Australia","UK","Japan"],"name":"options"},"inputsize":{"label":"Input Size","type":"select","value":[{"value":"input-mini","selected":false,"label":"Mini"},{"value":"input-small","selected":false,"label":"Small"},{"value":"input-medium","selected":false,"label":"Medium"},{"value":"input-large","selected":false,"label":"Large"},{"value":"input-xlarge","selected":true,"label":"Xlarge"},{"value":"input-xxlarge","selected":false,"label":"Xxlarge"}],"name":"inputsize"}}},{"title":"Multiple Radios","fields":{"name":{"label":"Group Name","type":"input","value":"status98nm","name":"name"},"label":{"label":"Label Text","type":"input","value":"Status","name":"label"},"required":{"label":"Required","type":"checkbox","value":false,"name":"required"},"radios":{"label":"Radios","type":"textarea-split","value":["Active","Inactive"],"name":"radios"}}},{"title":"Single Button","fields":{"id":{"label":"ID / Name","type":"input","value":"singlebutton44d","name":"id"},"label":{"label":"Label Text","type":"input","value":"","name":"label"},"buttonlabel":{"label":"Button Label","type":"input","value":"Submit","name":"buttonlabel"},"buttontype":{"label":"Button Type","type":"select","value":[{"value":"btn-default","selected":false,"label":"Default"},{"value":"btn-primary","selected":true,"label":"Primary"},{"value":"btn-info","selected":false,"label":"Info"},{"value":"btn-success","selected":false,"label":"Success"},{"value":"btn-warning","selected":false,"label":"Warning"},{"value":"btn-danger","selected":false,"label":"Danger"},{"value":"btn-inverse","selected":false,"label":"Inverse"}],"name":"buttontype"}}}]',
+              'rendered' => '<form class="form-horizontal">
 <fieldset>
 
 <!-- Form Name -->
@@ -116,13 +115,13 @@ Inactive
 </fieldset>
 </form>
 ',
-				'redirect_to' => 'list',
-				'extra_code' => '',
-				'email' => '',
-				'created_at' => '2014-03-28 05:18:25',
-				'updated_at' => '2014-03-28 05:18:25',
-			),
-		));
-	}
+              'redirect_to' => 'list',
+              'extra_code' => '',
+              'email' => '',
+              'created_at' => '2014-03-28 05:18:25',
+              'updated_at' => '2014-03-28 05:18:25',
+            ),
+        ));
+    }
 
 }

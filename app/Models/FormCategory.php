@@ -1,4 +1,5 @@
 <?php
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,32 +10,24 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-class FormCategory extends Eloquent {
+
+class FormCategory extends Eloquent
+{
+    public static $rules = array(
+      'name' => 'alpha_spaces|required|unique:form_categories,name'
+    );
     /**
      * The database table used by the model.
      *
      * @var string
      */
     protected $table = 'form_categories';
-	protected $guarded = array();
+    protected $guarded = array();
 
-	public static $rules = array(
-            'name' => 'alpha_spaces|required|unique:form_categories,name'
-        );
-
-    /**
-     * Relation with built_forms table
-     * Many forms can belong to a form category
-     */
-    public function forms()
-    {
-        return $this->hasMany('BuiltForm', 'category');
-    }
-
-    public static function validate($input, $id=false)
+    public static function validate($input, $id = false)
     {
         if ($id) {
-            static::$rules['name'] .= ','.$id;
+            static::$rules['name'] .= ',' . $id;
         }
         return Validator::make($input, static::$rules);
     }
@@ -50,5 +43,14 @@ class FormCategory extends Eloquent {
             $ret[$form_cat->id] = $form_cat->name;
         }
         return $ret;
+    }
+
+    /**
+     * Relation with built_forms table
+     * Many forms can belong to a form category
+     */
+    public function forms()
+    {
+        return $this->hasMany('BuiltForm', 'category');
     }
 }

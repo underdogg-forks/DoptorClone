@@ -1,4 +1,5 @@
 <?php namespace Components\ReportBuilder\Models;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,16 +12,24 @@ Description :  Doptor is Opensource CMS.
 */
 use Eloquent;
 use Str;
-
 use Robbo\Presenter\PresentableInterface;
-
 use Components\ReportBuilder\Presenters\ReportBuilderPresenter;
 
-class BuiltReport extends Eloquent implements PresentableInterface {
+class BuiltReport extends Eloquent implements PresentableInterface
+{
 
     protected $table = 'built_reports';
 
-    protected $fillable = array('name', 'author', 'version', 'website', 'modules', 'show_calendars', 'created_by', 'updated_by');
+    protected $fillable = array(
+      'name',
+      'author',
+      'version',
+      'website',
+      'modules',
+      'show_calendars',
+      'created_by',
+      'updated_by'
+    );
 
     protected $guarded = array('id');
 
@@ -28,7 +37,6 @@ class BuiltReport extends Eloquent implements PresentableInterface {
     {
         $attributes['modules'] = json_encode($attributes['modules']);
         $attributes['created_by'] = current_user()->id;
-
         return parent::create($attributes);
     }
 
@@ -36,7 +44,6 @@ class BuiltReport extends Eloquent implements PresentableInterface {
     {
         $attributes['modules'] = json_encode($attributes['modules']);
         $attributes['updated_by'] = current_user()->id;
-
         return parent::update($attributes);
     }
 

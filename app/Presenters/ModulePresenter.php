@@ -36,12 +36,10 @@ class ModulePresenter extends Presenter
             $ret_links[$alias] = $name;
         } else {
             $links = json_decode($this->links);
-
             foreach ($links as $link) {
                 $ret_links[$link->alias] = $link->name;
             }
         }
-
         return $ret_links;
     }
 
@@ -53,14 +51,12 @@ class ModulePresenter extends Presenter
     {
         if ($this->table != '') {
             $tables = explode('|', $this->table);
-
-            $tables = array_map(function($table) {
+            $tables = array_map(function ($table) {
                 return 'mdl_' . $table;
             }, $tables);
         } else {
             $tables = [];
         }
-
         return implode(', ', $tables);
     }
 }

@@ -1,4 +1,5 @@
 <?php namespace Admin;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,7 +10,8 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-class HomeController extends AdminController {
+class HomeController extends AdminController
+{
 
     /**
      * Index page of admin dashboard
@@ -18,7 +20,7 @@ class HomeController extends AdminController {
     public function getIndex()
     {
         $this->layout->title = 'Home';
-        $this->layout->content = \View::make('admin.'.$this->current_theme.'.index');
+        $this->layout->content = \View::make('admin.' . $this->current_theme . '.index');
     }
 
     /**
@@ -28,6 +30,6 @@ class HomeController extends AdminController {
     public function getConfig()
     {
         $this->layout->title = 'Website Configuration';
-        $this->layout->content = \View::make('admin.'.$this->current_theme.'.config');
+        $this->layout->content = \View::make('admin.' . $this->current_theme . '.config');
     }
 }

@@ -1,4 +1,5 @@
 <?php namespace Components\ThemeManager\Controllers\Backend;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -12,17 +13,16 @@ Description :  Doptor is Opensource CMS.
 use Backend\AdminController as BaseController;
 use App, Exception, Input, Theme, Redirect, Request, Response, Sentry, Str, View, File;
 use Services\Validation\ValidationException as ValidationException;
-
 use \Components\ThemeManager\Services\ThemeInstaller;
 
-class ThemeManagerController extends BaseController {
+class ThemeManagerController extends BaseController
+{
 
     public function __construct()
     {
         // Add location hinting for views
-        View::addLocation(app_path().'/components/theme_manager/views');
-        View::addNamespace('theme_manager', app_path().'/components/theme_manager/views');
-
+        View::addLocation(app_path() . '/components/theme_manager/views');
+        View::addNamespace('theme_manager', app_path() . '/components/theme_manager/views');
         parent::__construct();
     }
 
@@ -34,11 +34,9 @@ class ThemeManagerController extends BaseController {
     public function index()
     {
         $themes = Theme::get();
-
         $this->layout->title = trans('cms.theme_manager');
-
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.theme_manager.index')
-                                        ->with('themes', $themes);
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.theme_manager.index')
+          ->with('themes', $themes);
     }
 
     /**
@@ -49,7 +47,7 @@ class ThemeManagerController extends BaseController {
     public function create()
     {
         $this->layout->title = 'New Theme Entry';
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.theme_manager.create_edit');
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.theme_manager.create_edit');
     }
 
     /**
@@ -60,87 +58,76 @@ class ThemeManagerController extends BaseController {
     public function store()
     {
         $input = Input::all();
-
         if (!isset($input['file'])) {
             return Redirect::back()
-                            ->with('error_message', trans('error_messages.theme_file_select'));
+              ->with('error_message', trans('error_messages.theme_file_select'));
         }
-
         $theme_installer = new ThemeInstaller($this, $input);
-
         return $theme_installer->installTheme();
     }
 
     /**
      * Display the specified theme.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function apply($id)
     {
         $theme = Theme::findOrFail($id);
-
         \Setting::setValue("{$theme->target}_theme", $theme->id);
-
         return Redirect::to('backend/theme-manager')
-                            ->with('success_message', 'The theme was successfully applied');
+          ->with('success_message', 'The theme was successfully applied');
     }
 
     /**
      * Remove the specified theme from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
-    public function destroy($id=null)
+    public function destroy($id = null)
     {
         // If multiple ids are specified
         if ($id == 'multiple') {
             $selected_ids = trim(Input::get('selected_ids'));
             if ($selected_ids == '') {
                 return Redirect::back()
-                                ->with('error_message', trans('error_messages.nothing_selected_delete'));
+                  ->with('error_message', trans('error_messages.nothing_selected_delete'));
             }
             $selected_ids = explode(' ', $selected_ids);
         } else {
             $selected_ids = array($id);
         }
-
         foreach ($selected_ids as $id) {
             $theme = Theme::findOrFail($id);
-
             if (\Setting::value("{$theme->target}_theme") == $theme->id) {
                 return Redirect::back()
-                                ->with('error_message', "The theme {$theme->name} can not be deleted because it is currently being used as {$theme->target} theme.");
+                  ->with('error_message',
+                    "The theme {$theme->name} can not be deleted because it is currently being used as {$theme->target} theme.");
             }
-
             File::delete($theme->screenshot);
-
             File::deleteDirectory(app_path() . "/../resources/views/{$theme->target}/{$theme->directory}/", false);
             File::deleteDirectory(public_path() . "/assets/{$theme->target}/{$theme->directory}/", false);
-
             $theme->settings()->delete();
             $theme->delete();
         }
-
         $wasOrWere = (count($selected_ids) > 1) ? 's were' : ' was';
-        $message = 'The theme'. $wasOrWere . ' deleted.';
-
+        $message = 'The theme' . $wasOrWere . ' deleted.';
         return Redirect::to("backend/theme-manager")
-                                ->with('success_message', $message);
+          ->with('success_message', $message);
     }
 
     public function installerFails($errors)
     {
         return Redirect::back()
-                            ->withInput()
-                            ->with('error_message', $errors);
+          ->withInput()
+          ->with('error_message', $errors);
     }
 
-    public function installerSucceeds($redirect_to, $message='')
+    public function installerSucceeds($redirect_to, $message = '')
     {
         return Redirect::to($redirect_to)
-                            ->with('success_message', $message);
+          ->with('success_message', $message);
     }
 }

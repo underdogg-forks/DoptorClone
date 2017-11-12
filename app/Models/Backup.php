@@ -1,4 +1,5 @@
 <?php
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,7 +10,9 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-class Backup extends Eloquent {
+
+class Backup extends Eloquent
+{
     protected $fillable = ['file', 'includes', 'description'];
 
     protected $guarded = ['id'];

@@ -18,13 +18,13 @@ use Input;
 use Schema;
 use Str;
 use ZipArchive;
-
 use BuiltForm;
 use BuiltModule;
 use FormCategory;
 use Module;
 
-class ModuleInstaller {
+class ModuleInstaller
+{
 
     private $config;
 
@@ -43,55 +43,39 @@ class ModuleInstaller {
     public function installModule($file)
     {
         @ini_set('max_execution_time', 0);     // Temporarily increase maximum execution time
-
         if (is_file($file)) {
             $filename = $this->uploadModule($file);
-
             $canonical = str_replace('.zip', '', $filename);
-
             $unzipSuccess = $this->Unzip("{$this->temp_path}{$filename}", "{$this->temp_path}{$canonical}");
             if (!$unzipSuccess) {
                 throw new Exception("The module file {$filename} couldn\'t be extracted.");
             }
-
             $temp_module_dir = "{$this->temp_path}{$canonical}/";
             $replace_existing = (bool)Input::get('replace_existing');
         } else {
             $temp_module_dir = $file;
             $replace_existing = true;
         }
-
         $config_file = $temp_module_dir . 'module.json';
-
         if (!File::exists($config_file)) {
             throw new Exception('module.json doesn\'t exist in the module');
         }
-
         $this->config = json_decode(file_get_contents($config_file), true);
-
         if (Module::where('alias', '=', $this->config['info']['alias'])->first()
-            && !$replace_existing
+          && !$replace_existing
         ) {
             throw new Exception('Another module with the same name already exists');
         }
-
         $this->checkIfRequiredModulesExist();
-
         // Copy modules from temporary folder to modules folder
         $this->copyModule($temp_module_dir);
-
         File::delete($file);
-
         $this->manageTables();
-
         $form_ids = $this->addToBuiltForms();
-
         if ($form_ids) {
             $this->addToBuiltModules($form_ids);
         }
-
         $input = $this->fixInput();
-
         return $input;
     }
 
@@ -105,22 +89,17 @@ class ModuleInstaller {
     {
         $filename = $file->getClientOriginalName();
         $extension = $file->getClientOriginalExtension();
-
         if ($extension == '') {
             $filename = $filename . '.zip';
         }
-
         $full_filename = $this->temp_path . $filename;
         File::exists($full_filename) && File::delete($full_filename);
-
         // Upload the module zip file to temporary folder
         $uploadSuccess = $file->move($this->temp_path, $filename);
-//        if (!isset($uploadSuccess->fileName)) {
-//            throw new Exception('The file couldn\'t be uploaded.');
-//        }
-
+        //        if (!isset($uploadSuccess->fileName)) {
+        //            throw new Exception('The file couldn\'t be uploaded.');
+        //        }
         $filename = str_replace('.ZIP', '.zip', $filename);
-
         return $filename;
     }
 
@@ -131,28 +110,22 @@ class ModuleInstaller {
     private function checkIfRequiredModulesExist()
     {
         $module_details = $this->config;
-
         $required_modules = (isset($module_details['requires'])) ? $module_details['requires'] : null;
-
         if ($required_modules) {
             $missing_modules = [];
             foreach ($required_modules as $required_module) {
                 $split = explode('/', $required_module);
-
                 if (sizeof($split) == 2) {
                     // If module contains vendor
                     $vendor = $split[0];
                     $module_alias = $split[1];
-
                     $module = Module::where('alias', $module_alias)
-                                        ->where('vendor', $vendor)
-                                        ->first();
+                      ->where('vendor', $vendor)
+                      ->first();
                 } else {
                     $module_alias = $split[0];
-
                     $module = Module::where('alias', $module_alias)->first();
                 }
-
                 if (!$module) {
                     $missing_modules[] = $required_module;
                 }
@@ -174,10 +147,8 @@ class ModuleInstaller {
         } else {
             $target_dir = "{$this->modules_path}{$this->config['info']['alias']}/";
         }
-
         File::copyDirectory("{$temp_module_dir}{$this->config['info']['alias']}", $target_dir);
         File::copy("{$temp_module_dir}module.json", $target_dir . "module.json");
-
         File::deleteDirectory($temp_module_dir);
     }
 
@@ -195,28 +166,25 @@ class ModuleInstaller {
         } else {
             $table = '';
         }
-
         $links = (isset($this->config['links'])) ? json_encode($this->config['links']) : '';
         $models = (isset($this->config['models'])) ? json_encode($this->config['models']) : '';
         $form_fields = (isset($this->config['form_fields'])) ? json_encode($this->config['form_fields']) : '';
-
         $input = array(
-            'name'        => $this->config['info']['name'],
-            'alias'       => $this->config['info']['alias'],
-            'hash'        => $this->config['info']['hash'],
-            'version'     => $this->config['info']['version'],
-            'author'      => $this->config['info']['author'],
-            'vendor'      => isset($this->config['info']['vendor']) ? $this->config['info']['vendor'] : '',
-            'website'     => $this->config['info']['website'],
-            'target'      => $this->config['target'],
-            'links'       => $links,
-            'models'      => $models,
-            'form_fields' => $form_fields,
-            'table'       => $table,
-            'migrations'  => $this->config['migrations'],
-            'enabled'     => true
+          'name' => $this->config['info']['name'],
+          'alias' => $this->config['info']['alias'],
+          'hash' => $this->config['info']['hash'],
+          'version' => $this->config['info']['version'],
+          'author' => $this->config['info']['author'],
+          'vendor' => isset($this->config['info']['vendor']) ? $this->config['info']['vendor'] : '',
+          'website' => $this->config['info']['website'],
+          'target' => $this->config['target'],
+          'links' => $links,
+          'models' => $models,
+          'form_fields' => $form_fields,
+          'table' => $table,
+          'migrations' => $this->config['migrations'],
+          'enabled' => true
         );
-
         return $input;
     }
 
@@ -240,7 +208,6 @@ class ModuleInstaller {
                 }
             }
         }
-
         $this->dbMigrate();
     }
 
@@ -279,7 +246,6 @@ class ModuleInstaller {
         $alter_sql = "ALTER TABLE mdl_{$vendor}_{$form['table']} ";
         $add_columns = array();
         $previous_field = 'id';
-
         foreach ($form['fields'] as $field) {
             if (!Schema::hasColumn("mdl_{$vendor}_{$form['table']}", $field)) {
                 $add_columns[] = "ADD COLUMN `{$field}` text COLLATE utf8_unicode_ci NULL AFTER `{$previous_field}`";
@@ -293,44 +259,35 @@ class ModuleInstaller {
     public function dbMigrate()
     {
         $this->runMigrations();
-
         $this->storeMigrationData();
-
         $this->seedDatabase();
     }
 
     public function runMigrations()
     {
         $directory = $this->config['info']['alias'];
-
         if (isset($this->config['info']['vendor'])) {
             $vendor = $this->config['info']['vendor'] . '/';
         } else {
             $vendor = '';
         }
-
         $migrations_dir = 'app/Modules/' . $vendor . $directory . '/Database/Migrations';
-
         Artisan::call('migrate', ['--path' => $migrations_dir]);
     }
 
     public function storeMigrationData()
     {
         $directory = $this->config['info']['alias'];
-
         if (isset($this->config['info']['vendor'])) {
             $vendor = $this->config['info']['vendor'] . '/';
         } else {
             $vendor = '';
         }
-
         $migrations_dir = app_path('Modules/' . $vendor . $directory . '/Database/Migrations');
         $migration_files = [];
-
         foreach (File::files($migrations_dir) as $file) {
             $migration_files[] = pathinfo($file)['filename'];
         }
-
         $this->config['migrations'] = json_encode($migration_files);
     }
 
@@ -342,9 +299,7 @@ class ModuleInstaller {
         } else {
             $vendor = '';
         }
-
         $seed_dir = app_path('Modules/' . $vendor . $directory . '/Database/Seeds');
-
         if (File::files($seed_dir)) {
             foreach (File::files($seed_dir) as $file) {
                 require_once($file);
@@ -363,38 +318,34 @@ class ModuleInstaller {
     {
         $forms = ['forms'];
         $form_ids = array();
-
         foreach ($forms as $form) {
             if (!isset($form['data'])) {
                 return false;
             }
             $existing_form = BuiltForm::whereNotNull('hash')
-                                    ->where('hash', $form['hash'])
-                                    ->first();
-
+              ->where('hash', $form['hash'])
+              ->first();
             $existing_form_category = FormCategory::where('name', $form['category'])->first();
             if ($existing_form_category) {
                 $form_category = $existing_form_category->id;
             } else {
                 $category = FormCategory::create(array(
-                        'name' => $form['category']
-                    ));
+                  'name' => $form['category']
+                ));
                 $form_category = $category->id;
             }
-
             $form_data = array(
-                    'name'         => $form['form_name'],
-                    'hash'         => $form['hash'],
-                    'description'  => $form['description'],
-                    'category'     => $form_category,
-                    'show_captcha' => $form['show_captcha'],
-                    'data'         => $form['data'],
-                    'rendered'     => $form['rendered'],
-                    'extra_code'   => $form['extra_code'],
-                    'redirect_to'  => $form['redirect_to'],
-                    'email'        => $form['email']
-                );
-
+              'name' => $form['form_name'],
+              'hash' => $form['hash'],
+              'description' => $form['description'],
+              'category' => $form_category,
+              'show_captcha' => $form['show_captcha'],
+              'data' => $form['data'],
+              'rendered' => $form['rendered'],
+              'extra_code' => $form['extra_code'],
+              'redirect_to' => $form['redirect_to'],
+              'email' => $form['email']
+            );
             if ($existing_form) {
                 $existing_form->update($form_data);
                 $form_ids[] = $existing_form->id;
@@ -403,7 +354,6 @@ class ModuleInstaller {
                 $form_ids[] = $form_id['id'];
             }
         }
-
         return $form_ids;
     }
 
@@ -416,25 +366,22 @@ class ModuleInstaller {
     public function addToBuiltModules($module, $form_ids)
     {
         $existing_module = BuiltModule::whereNotNull('hash')
-                                ->where('hash', $module['info']['hash'])
-                                ->first();
-
+          ->where('hash', $module['info']['hash'])
+          ->first();
         $table_names = array_pluck($module['forms'], 'table');
         $table_name = implode('|', $table_names);
-
         $module_info = array(
-                'name'        => $module['info']['name'],
-                'hash'        => $module['info']['hash'],
-                'alias'       => $module['info']['alias'],
-                'version'     => $module['info']['version'],
-                'author'      => $module['info']['author'],
-                'website'     => $module['info']['website'],
-                'description' => $module['info']['description'],
-                'form_id'     => implode(', ', $form_ids),
-                'target'      => $module['target'],
-                'table_name'  => $table_name,
-            );
-
+          'name' => $module['info']['name'],
+          'hash' => $module['info']['hash'],
+          'alias' => $module['info']['alias'],
+          'version' => $module['info']['version'],
+          'author' => $module['info']['author'],
+          'website' => $module['info']['website'],
+          'description' => $module['info']['description'],
+          'form_id' => implode(', ', $form_ids),
+          'target' => $module['target'],
+          'table_name' => $table_name,
+        );
         if ($existing_module) {
             $existing_module->update($module_info);
         } else {
@@ -456,12 +403,10 @@ class ModuleInstaller {
         //     return Redirect::to('backend/modules')
         //                         ->with('error_message', "Can't read input file");
         // }
-
         // if(!is_dir($path) || !is_writable($path)) {
         //     return Redirect::to('backend/modules')
         //                         ->with('error_message', "Can't write to target");
         // }
-
         $zip = new ZipArchive;
         $res = $zip->open($file);
         if ($res === true) {
@@ -472,7 +417,6 @@ class ModuleInstaller {
                 //skip
             }
             $zip->close();
-
             return true;
         } else {
             return false;

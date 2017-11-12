@@ -1,4 +1,5 @@
 <?php namespace Modules\ModuleName\Controllers;
+
 /*
 =================================================
 Module Name     :   NameOfTheModule
@@ -13,11 +14,11 @@ use Input;
 use Redirect;
 use Str;
 use View;
-
 use Backend\AdminController as BaseController;
 use Services\Validation\ValidationException as ValidationException;
 
-class BackendController extends BaseController {
+class BackendController extends BaseController
+{
 
     /**
      * The layout that should be used for responses.
@@ -40,25 +41,20 @@ class BackendController extends BaseController {
         $this->module_alias = $this->config['info']['alias'];
         $this->module_vendor = $this->config['info']['vendor'];
         $this->module_link = Str::snake($this->module_alias, '_');
-
         if ($this->module_vendor) {
             $this->module_namespace = "Modules\\{$this->module_vendor}\\{$this->module_alias}\\";
         } else {
             $this->module_namespace = "Modules\\{$this->module_alias}\\";
         }
-
         View::share('module_name', $this->module_name);
         View::share('module_alias', $this->module_alias);
         View::share('module_vendor', $this->module_vendor);
         View::share('module_link', $this->module_link);
-
         parent::__construct();
-
         $this->type = $this->link_type;
-
         // Add location hinting for views
         View::addNamespace($this->module_alias,
-            app_path() . "/Modules/{$this->module_vendor}/{$this->module_alias}/Views");
+          app_path() . "/Modules/{$this->module_vendor}/{$this->module_alias}/Views");
     }
 
     /**
@@ -68,11 +64,10 @@ class BackendController extends BaseController {
     public function index()
     {
         $this->getFormEntries();
-
         $this->layout->title = "All Entries in {$this->module_name}";
         $this->layout->content = View::make("{$this->module_alias}::{$this->type}.index")
-            ->with('title', "All Entries in {$this->module_name}")
-            ->with('forms', $this->forms);
+          ->with('title', "All Entries in {$this->module_name}")
+          ->with('forms', $this->forms);
     }
 
     /**
@@ -82,13 +77,11 @@ class BackendController extends BaseController {
     {
         $vendor = Str::lower($this->module_vendor);
         $forms = $this->forms;
-
         foreach ($forms as $i => $form) {
             $form_fields = $form['fields'];
-
             foreach ($form_fields as $key => $form_field) {
                 if (isset($form['fields_to_show']) &&
-                    !in_array($form_field, $form['fields_to_show'])
+                  !in_array($form_field, $form['fields_to_show'])
                 ) {
                     // Remove fields that are not to be shown
                     unset($forms[$i]['fields'][$key]);
@@ -98,7 +91,6 @@ class BackendController extends BaseController {
                 }
             }
         }
-
         $this->forms = $forms;
     }
 
@@ -112,12 +104,11 @@ class BackendController extends BaseController {
         // Get only the form that matches the specified form id
         $form = $this->getForm($form_id);
         $sources = $this->getSources();
-
         $this->layout->title = "Add New Entry in {$this->module_name}";;
         $this->layout->content = View::make("{$this->module_alias}::{$this->type}.create_edit")
-            ->with('title', "Add New Entry in {$this->module_name}")
-            ->with('form', $form)
-            ->with('sources', $sources);
+          ->with('title', "Add New Entry in {$this->module_name}")
+          ->with('form', $form)
+          ->with('sources', $sources);
     }
 
     /**
@@ -127,19 +118,15 @@ class BackendController extends BaseController {
     public function store()
     {
         $input = Input::all();
-
         if (isset($input['form_close'])) {
             return Redirect::to("{$this->link}modules/{$this->module_link}");
         }
-
         if (isset($input['form_save'])) {
             $redirect = "{$this->link}modules/{$this->module_link}";
         } else {
             $redirect = "{$this->link}modules/{$this->module_link}/create/{$input['form_id']}";
         }
-
         $form = $this->getForm($input['form_id']);
-
         $model_name = $this->module_namespace . "Models\\{$form['model']}";
 
         try {
@@ -150,10 +137,10 @@ class BackendController extends BaseController {
 
         if ($entry) {
             return Redirect::to($redirect)
-                ->with('success_message', trans('success_messages.entry_create'));
+              ->with('success_message', trans('success_messages.entry_create'));
         } else {
             return Redirect::back()
-                ->with('error_message', trans('error_messages.entry_create'));
+              ->with('error_message', trans('error_messages.entry_create'));
         }
     }
 
@@ -167,16 +154,15 @@ class BackendController extends BaseController {
     {
         // Get only the form that matches the specified form id
         $form = $this->getForm($form_id);
-
         $model_name = $this->module_namespace . "Models\\{$form['model']}";
         $entry = $model_name::findOrFail($id);
 
         $this->layout->title = "Showing Entry in {$this->module_name}";;
         $this->layout->content = View::make("{$this->module_alias}::{$this->type}.show")
-            ->with('title', "Showing Entry in {$this->module_name}")
-            ->with('entry', $entry)
-            ->with('field_names', $form['field_names'])
-            ->with('fields', $form['fields']);
+          ->with('title', "Showing Entry in {$this->module_name}")
+          ->with('entry', $entry)
+          ->with('field_names', $form['field_names'])
+          ->with('fields', $form['fields']);
     }
 
     /**
@@ -190,17 +176,16 @@ class BackendController extends BaseController {
         // Get only the form that matches the specified form id
         $form = $this->getForm($form_id);
         $sources = $this->getSources();
-
         $model_name = $this->module_namespace . "Models\\{$form['model']}";
         $entry = $model_name::findOrFail($id);
 
         $this->layout->title = "Edit Entry in {$this->module_name}";;
 
         $this->layout->content = View::make("{$this->module_alias}::{$this->type}.create_edit")
-            ->with('title', "Edit Entry in module {$this->module_name}")
-            ->with('entry', $entry)
-            ->with('form', $form)
-            ->with('sources', $sources);
+          ->with('title', "Edit Entry in module {$this->module_name}")
+          ->with('entry', $entry)
+          ->with('form', $form)
+          ->with('sources', $sources);
     }
 
     /**
@@ -212,17 +197,14 @@ class BackendController extends BaseController {
     public function update($id)
     {
         $input = Input::all();
-
         if (isset($input['form_close'])) {
             return Redirect::to("{$this->link}modules/{$this->module_link}");
         }
-
         if (isset($input['form_save'])) {
             $redirect = "{$this->link}modules/{$this->module_link}";
         } else {
             $redirect = "{$this->link}modules/{$this->module_link}/create/{$input['form_id']}";
         }
-
         $form = $this->getForm($input['form_id']);
         $model_name = $this->module_namespace . "Models\\{$form['model']}";
 
@@ -234,10 +216,10 @@ class BackendController extends BaseController {
 
         if ($entry) {
             return Redirect::to($redirect)
-                ->with('success_message', trans('success_messages.entry_update'));
+              ->with('success_message', trans('success_messages.entry_update'));
         } else {
             return Redirect::back()
-                ->with('error_message', trans('error_messages.entry_update'));
+              ->with('error_message', trans('error_messages.entry_update'));
         }
     }
 
@@ -254,19 +236,17 @@ class BackendController extends BaseController {
             $selected_ids = trim(Input::get('selected_ids'));
             if ($selected_ids == '') {
                 return Redirect::back()
-                    ->with('error_message', trans('error_messages.nothing_selected_delete'));
+                  ->with('error_message', trans('error_messages.nothing_selected_delete'));
             }
             $selected_ids = explode(' ', $selected_ids);
         } else {
             $selected_ids = array($id);
         }
-
         $form = $this->getForm(Input::get('form_id'));
         $model_name = $this->module_namespace . "Models\\{$form['model']}";
 
         foreach ($selected_ids as $id) {
             $entry = $model_name::findOrFail($id);
-
             $entry->delete();
         }
 
@@ -277,7 +257,7 @@ class BackendController extends BaseController {
         }
 
         return Redirect::back()
-            ->with('success_message', $message);
+          ->with('success_message', $message);
     }
 
     /**
@@ -287,10 +267,11 @@ class BackendController extends BaseController {
     private function getForm($form_id)
     {
         $form = array_filter($this->forms, function ($form) use ($form_id) {
-            if ($form['form_id'] == $form_id) return true;
+            if ($form['form_id'] == $form_id) {
+                return true;
+            }
         });
         $form = head($form);
-
         return $form;
     }
 
@@ -300,7 +281,7 @@ class BackendController extends BaseController {
      */
     private function getSources()
     {
-        $sources = ***SOURCES***;
+        $sources = ***SOURCES ***;
 
         return $sources;
     }

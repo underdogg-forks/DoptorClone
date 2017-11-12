@@ -1,4 +1,5 @@
 <?php namespace Components\MediaManager\Controllers\Backend;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -13,14 +14,14 @@ use Backend\AdminController as BaseController;
 use App, Exception, Input, MediaEntry, Redirect, Request, Response, Sentry, Str, View, File;
 use Services\Validation\ValidationException as ValidationException;
 
-class MediaManagerController extends BaseController {
+class MediaManagerController extends BaseController
+{
 
     public function __construct()
     {
         // Add location hinting for views
         // View::addLocation(app_path().'/components/media_manager/views');
         // View::addNamespace('media_manager', app_path().'/components/media_manager/views');
-
         parent::__construct();
     }
 
@@ -32,60 +33,50 @@ class MediaManagerController extends BaseController {
     public function index()
     {
         if (Request::ajax()) {
-            $this->layout = View::make($this->link_type.'.'.$this->current_theme.'._layouts._modal');
+            $this->layout = View::make($this->link_type . '.' . $this->current_theme . '._layouts._modal');
             $ajax = true;
         } else {
             $ajax = false;
         }
-
         $this->layout->title = trans('cms.media_manager');;
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.media_manager.create_edit')
-                                        ->with('base_dir', 'uploads')
-                                        ->with('ajax', $ajax);
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.media_manager.create_edit')
+          ->with('base_dir', 'uploads')
+          ->with('ajax', $ajax);
     }
 
     public function folder_contents()
     {
         $directory = Input::get('dir', '');
-
         $files = array();
-
         foreach (File::files(public_path($directory)) as $key => $file) {
             $pathinfo = pathinfo($file);
-
             $dir = str_replace(base_path() . '/public/', '', $pathinfo['dirname']);
             $dir = str_replace(base_path() . '/', '', $dir);
-
             $filename = $dir . '/' . $pathinfo['filename'] . '.' . $pathinfo['extension'];
             $thumbnail = $dir . '/thumbs/' . $filename;
-
             if (File::exists($thumbnail)) {
                 $files[] = $thumbnail;
             } else {
                 $files[] = $filename;
             }
         }
-
         $dirs = array();
-
         foreach (File::directories(public_path($directory)) as $dir) {
             if (!str_contains($dir, 'thumbs')) {
                 $dir_name = str_replace('\\', '/', $dir);
                 $dirs[] = $dir_name;
             }
         }
-
-        $ret =  array(
-                'files' => $files,
-                'dirs'  => $dirs
-            );
+        $ret = array(
+          'files' => $files,
+          'dirs' => $dirs
+        );
         return Response::json($ret, 200);
     }
 
     public function create_folder()
     {
         $dir = Input::get('dir', '');
-
         if (File::makeDirectory(public_path($dir))) {
             return Response::json('Success', 200);
         } else {
@@ -104,14 +95,12 @@ class MediaManagerController extends BaseController {
         // return Response::json($input['folder'], 400);
         $input['image'] = $input['file'];
         unset($input['file']);
-
         try {
             $media_entry = MediaEntry::create($input);
-
             if ($media_entry) {
-               return Response::json('Success', 200);
+                return Response::json('Success', 200);
             } else {
-               return Response::json('Error', 400);
+                return Response::json('Error', 400);
             }
 
         } catch (ValidationException $e) {
@@ -124,56 +113,45 @@ class MediaManagerController extends BaseController {
     /**
      * Display the specified media_entry.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function show($id)
     {
-
-
         $media_entry = MediaEntry::findOrFail($id);
-
         $this->layout->title = $media_entry->title;
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.media_manager.show')
-                                        ->with('media_entry', $media_entry);
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.media_manager.show')
+          ->with('media_entry', $media_entry);
     }
 
     /**
      * Show the form for editing the specified media_entry.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function edit($id)
     {
-
         $this->layout->title = 'Edit Media Entry';
-        $this->layout->content = View::make($this->link_type.'.'.$this->current_theme.'.media_manager.create_edit')
-                                        ->with('media_entry', MediaEntry::findOrFail($id));
+        $this->layout->content = View::make($this->link_type . '.' . $this->current_theme . '.media_manager.create_edit')
+          ->with('media_entry', MediaEntry::findOrFail($id));
     }
 
     /**
      * Update the specified media_entry in storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function update($id)
     {
         $input = Input::all();
-
-        try
-        {
+        try {
             $media_entry = MediaEntry::findOrFail($id);
-
             $media_entry->update($input);
-
             return Redirect::to("backend/media-manager")
-                                ->with('success_message', trans('success_messages.media_entry_update'));
-        }
-
-        catch(ValidationException $e)
-        {
+              ->with('success_message', trans('success_messages.media_entry_update'));
+        } catch (ValidationException $e) {
             return Redirect::back()->withInput()->withErrors($e->getErrors());
         }
     }
@@ -181,54 +159,45 @@ class MediaManagerController extends BaseController {
     /**
      * Remove the specified media_entry from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
-    public function destroy($id=null)
+    public function destroy($id = null)
     {
         $file = Input::get('file');
         $split = explode('/', $file);
         $file_name = array_pop($split);
         $thumbnail = implode('/', $split) . '/thumbs/' . $file_name;
-
         if (File::exists($thumbnail)) {
             File::delete($thumbnail);
         }
-
         if (File::exists($file)) {
             File::delete($file);
         }
-
         return Response::json('Success', 200);
-
         // If multiple ids are specified
         if ($id == 'multiple') {
             $selected_ids = trim(Input::get('selected_ids'));
             if ($selected_ids == '') {
                 return Redirect::back()
-                                ->with('error_message', trans('error_messages.nothing_selected_delete'));
+                  ->with('error_message', trans('error_messages.nothing_selected_delete'));
             }
             $selected_ids = explode(' ', $selected_ids);
         } else {
             $selected_ids = array($id);
         }
-
         foreach ($selected_ids as $id) {
             $media_entry = MediaEntry::findOrFail($id);
-
             File::delete($media_entry->image);
             File::delete($media_entry->thumbnail);
-
             $media_entry->delete();
         }
-
         if (count($selected_ids) > 1) {
             $message = trans('success_messages.media_entry_delete');
         } else {
             $message = trans('success_messages.media_entries_delete');
         }
-
         return Redirect::to("backend/media-manager")
-                                ->with('success_message', $message);
+          ->with('success_message', $message);
     }
 }

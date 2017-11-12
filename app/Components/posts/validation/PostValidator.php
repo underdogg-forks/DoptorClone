@@ -1,4 +1,5 @@
 <?php namespace Components\Posts\Validation;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,18 +12,19 @@ Description :  Doptor is Opensource CMS.
 */
 use Services\Validation\Validator as Validator;
 
-class PostValidator extends Validator {
+class PostValidator extends Validator
+{
 
     /**
      * Default rules
      * @var array
      */
     protected $rules = array(
-        'title'     => 'alpha_spaces|required',
-        'permalink' => 'unique:posts,permalink',
+      'title' => 'alpha_spaces|required',
+      'permalink' => 'unique:posts,permalink',
         // 'image'     => 'image',
         // 'content'   => 'required',
-        'status'    => 'required'
+      'status' => 'required'
     );
 
     /**
@@ -30,11 +32,11 @@ class PostValidator extends Validator {
      * @var array
      */
     protected $updateRules = array(
-        'title'     => 'alpha_spaces|required',
-        'permalink' => 'unique:posts,permalink',
+      'title' => 'alpha_spaces|required',
+      'permalink' => 'unique:posts,permalink',
         // 'image'  => 'image',
         // 'content'   => 'required',
-        'status'    => 'required'
+      'status' => 'required'
     );
 
     /**
@@ -42,28 +44,25 @@ class PostValidator extends Validator {
      * @var array
      */
     protected $message = array(
-        'permalink.unique' => 'The alias has already been taken'
+      'permalink.unique' => 'The alias has already been taken'
     );
 
     public function validateForCreation($input)
     {
         if ($input['publish_start'] != '' && $input['publish_end'] != '') {
-            $this->rules['publish_start'] = 'before:'.$input['publish_end'];
-            $this->rules['publish_end'] = 'after:'.$input['publish_start'];
+            $this->rules['publish_start'] = 'before:' . $input['publish_end'];
+            $this->rules['publish_end'] = 'after:' . $input['publish_start'];
         }
-
         return $this->validate($input, $this->rules, $this->message);
     }
 
     public function validateForUpdate($input)
     {
         $this->updateRules['permalink'] .= ',' . $input['id'];
-
         if ($input['publish_start'] != '' && $input['publish_end'] != '') {
-            $this->updateRules['publish_start'] = 'before:'.$input['publish_end'];
-            $this->updateRules['publish_end'] = 'after:'.$input['publish_start'];
+            $this->updateRules['publish_start'] = 'before:' . $input['publish_end'];
+            $this->updateRules['publish_end'] = 'after:' . $input['publish_start'];
         }
-
         return $this->validate($input, $this->updateRules, $this->message);
     }
 }

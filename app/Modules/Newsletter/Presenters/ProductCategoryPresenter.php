@@ -1,7 +1,7 @@
 <?php namespace Modules\Newsletter\Presenters;
 
-use Str;
 use Robbo\Presenter\Presenter;
+use Str;
 
 class ProductCategoryPresenter extends Presenter
 {

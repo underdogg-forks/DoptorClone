@@ -1,14 +1,13 @@
 <?php namespace App\Handlers\Events;
 
 use App;
-use File;
-
 use App\Events\InstallationWasCompleted;
-
-use Illuminate\Queue\InteractsWithQueue;
+use File;
 use Illuminate\Contracts\Queue\ShouldBeQueued;
+use Illuminate\Queue\InteractsWithQueue;
 
-class DeleteInstaller {
+class DeleteInstaller
+{
 
     /**
      * Create the event handler.
@@ -23,7 +22,7 @@ class DeleteInstaller {
     /**
      * Handle the event.
      *
-     * @param  InstallationWasCompleted  $event
+     * @param  InstallationWasCompleted $event
      * @return void
      */
     public function handle(InstallationWasCompleted $event)

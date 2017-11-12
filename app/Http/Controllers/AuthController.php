@@ -9,11 +9,11 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-
-use Services\UserManager;
 use Services\UserGroupManager;
+use Services\UserManager;
 
-class AuthController extends BaseController {
+class AuthController extends BaseController
+{
 
     protected $user_manager;
     protected $usergroup_manager;
@@ -22,7 +22,6 @@ class AuthController extends BaseController {
     {
         $this->user_manager = $user_manager;
         $this->usergroup_manager = $usergroup_manager;
-
         parent::__construct();
     }
 
@@ -30,34 +29,30 @@ class AuthController extends BaseController {
      * View for the login page
      * @return View
      */
-    public function getLogin($target='admin')
+    public function getLogin($target = 'admin')
     {
         if (Sentry::check()) {
             return Redirect::to($target);
         }
-        $this->layout = View::make($target . '.'.$this->current_theme.'._layouts._login');
+        $this->layout = View::make($target . '.' . $this->current_theme . '._layouts._login');
         $this->layout->title = 'Login';
-        $this->layout->content = View::make($target . '.'.$this->current_theme.'.login');
+        $this->layout->content = View::make($target . '.' . $this->current_theme . '.login');
     }
 
     /**
      * Login action
      * @return Redirect
      */
-    public function postLogin($target='admin')
+    public function postLogin($target = 'admin')
     {
         $input = Input::all();
-
         $credentials = array(
-            'login' => $input['username'],
-            'password' => $input['password']
+          'login' => $input['username'],
+          'password' => $input['password']
         );
-
         $remember = (isset($input['remember']) && $input['remember'] == 'checked') ? true : false;
-
         try {
             $user = Sentry::authenticate($credentials, $remember);
-
             if ($user) {
                 if (isset($input['api'])) {
                     return Response::json(array(), 200);
@@ -68,29 +63,29 @@ class AuthController extends BaseController {
         } catch (Cartalyst\Sentry\Users\UserNotActivatedException $e) {
             if (isset($input['api'])) {
                 return Response::json(array(
-                                        'error' => trans('users.check_activation_email')
-                                        ), 200);
+                  'error' => trans('users.check_activation_email')
+                ), 200);
             } else {
                 return Redirect::back()
-                                    ->withErrors(trans('users.check_activation_email'));
+                  ->withErrors(trans('users.check_activation_email'));
             }
         } catch (Cartalyst\Sentry\Throttling\UserSuspendedException $e) {
             if (isset($input['api'])) {
                 return Response::json(array(
-                                        'error' => trans('users.account_suspended', array('minutes' => 10))
-                                        ), 200);
+                  'error' => trans('users.account_suspended', array('minutes' => 10))
+                ), 200);
             } else {
                 return Redirect::back()
-                                    ->withErrors(trans('users.account_suspended', array('minutes' => 10)));
+                  ->withErrors(trans('users.account_suspended', array('minutes' => 10)));
             }
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             if (isset($input['api'])) {
                 return Response::json(array(
-                                        'error' => trans('users.invalid_username_pw')
-                                        ), 200);
+                  'error' => trans('users.invalid_username_pw')
+                ), 200);
             } else {
                 return Redirect::back()
-                                    ->withErrors(trans('users.invalid_username_pw'));
+                  ->withErrors(trans('users.invalid_username_pw'));
             }
         }
     }
@@ -102,139 +97,122 @@ class AuthController extends BaseController {
     public function getLogout()
     {
         Sentry::logout();
-
         return Redirect::to('/');
     }
 
     public function postForgotPassword()
     {
         $input = Input::all();
-
         $validator = User::validate_reset($input);
-
         if ($validator->passes()) {
             $user = User::whereEmail($input['email'])->first();
-
             if ($user) {
                 $user = Sentry::findUserByLogin($user->username);
-
                 $resetCode = $user->getResetPasswordCode();
-
                 $data = array(
-                            'user_id'   => $user->id,
-                            'resetCode' => $resetCode
-                        );
-
-                Mail::queue('backend.'.$this->current_theme.'.reset_password_email', $data, function($message) use($input, $user) {
-                    $message->from(get_setting('email_username'), Setting::value('website_name'))
-                            ->to($input['email'], "{$user->first_name} {$user->last_name}")
-                            ->subject('Password reset ');
-                });
-
+                  'user_id' => $user->id,
+                  'resetCode' => $resetCode
+                );
+                Mail::queue('backend.' . $this->current_theme . '.reset_password_email', $data,
+                  function ($message) use ($input, $user) {
+                      $message->from(get_setting('email_username'), Setting::value('website_name'))
+                        ->to($input['email'], "{$user->first_name} {$user->last_name}")
+                        ->subject('Password reset ');
+                  });
                 return Redirect::back()
-                                   ->with('success_message', trans('success_messages.pw_reset_code_sent'));
+                  ->with('success_message', trans('success_messages.pw_reset_code_sent'));
             } else {
                 return Redirect::back()
-                                ->with('error_message', 'No user exists with the specified email address');
+                  ->with('error_message', 'No user exists with the specified email address');
             }
         } else {
             return Redirect::back()
-                            ->withInput()
-                            ->with('error_message', implode('<br>', $validator->messages()->get('email')));
+              ->withInput()
+              ->with('error_message', implode('<br>', $validator->messages()->get('email')));
         }
     }
 
-    public function getResetPassword($id, $token, $target='backend')
+    public function getResetPassword($id, $token, $target = 'backend')
     {
         if (Sentry::check()) {
             return Redirect::to($target);
         }
         try {
             $user = Sentry::findUserById($id);
-
-            $this->layout = View::make($target . '.'.$this->current_theme.'._layouts._login');
+            $this->layout = View::make($target . '.' . $this->current_theme . '._layouts._login');
             $this->layout->title = 'Reset Password';
-
             if ($user->checkResetPasswordCode($token)) {
-                $this->layout->content = View::make($target . '.'.$this->current_theme.'.reset_password')
-                                                ->with('id', $id)
-                                                ->with('token', $token)
-                                                ->with('target', $target)
-                                                ->with('user', $user);
+                $this->layout->content = View::make($target . '.' . $this->current_theme . '.reset_password')
+                  ->with('id', $id)
+                  ->with('token', $token)
+                  ->with('target', $target)
+                  ->with('user', $user);
             } else {
-                $this->layout->content = View::make($target . '.'.$this->current_theme.'.reset_password')
-                                                ->withErrors(array(
-                                                        'invalid_reset_code'=>'The provided password reset code is invalid'
-                                                    ));
+                $this->layout->content = View::make($target . '.' . $this->current_theme . '.reset_password')
+                  ->withErrors(array(
+                    'invalid_reset_code' => 'The provided password reset code is invalid'
+                  ));
             }
         } catch (Cartalyst\Sentry\Users\UserNotFoundException $e) {
-            $this->layout->content = View::make($target . '.'.$this->current_theme.'.reset_password')
-                                            ->withErrors('The specified user doesn\'t exist');
+            $this->layout->content = View::make($target . '.' . $this->current_theme . '.reset_password')
+              ->withErrors('The specified user doesn\'t exist');
         }
     }
 
     public function postResetPassword()
     {
         $input = Input::all();
-
         try {
             $user = Sentry::findUserById($input['id']);
-
             if ($input['username'] != $user->username
-                || $input['security_answer'] != $user->security_answer
-                ) {
+              || $input['security_answer'] != $user->security_answer
+            ) {
                 return Redirect::back()
-                                    ->withInput()
-                                    ->with('error_message', 'Either the username or security answer is incorrect');
+                  ->withInput()
+                  ->with('error_message', 'Either the username or security answer is incorrect');
             }
-
             if ($user->checkResetPasswordCode($input['token'])) {
                 if ($user->attemptResetPassword($input['token'], $input['password'])) {
-
                     $data = array(
-                            'user_id'      => $user->id,
-                            'created_at' => strtotime($user->created_at) * 1000
-                        );
-
-                    Mail::queue('backend.'.$this->current_theme.'.reset_password_confirm_email', $data, function($message) use($input, $user) {
-                        $message->from(get_setting('email_username'), Setting::value('website_name'))
-                                ->to($user->email, "{$user->first_name} {$user->last_name}")
-                                ->subject('Password Reset Confirmation');
-                    });
-
+                      'user_id' => $user->id,
+                      'created_at' => strtotime($user->created_at) * 1000
+                    );
+                    Mail::queue('backend.' . $this->current_theme . '.reset_password_confirm_email', $data,
+                      function ($message) use ($input, $user) {
+                          $message->from(get_setting('email_username'), Setting::value('website_name'))
+                            ->to($user->email, "{$user->first_name} {$user->last_name}")
+                            ->subject('Password Reset Confirmation');
+                      });
                     $user->last_pw_changed = date('Y-m-d h:i:s');
                     $user->save();
-
                     return Redirect::to("login/${input['target']}")
-                                        ->with('success_message', trans('success_messages.pw_reset'));
+                      ->with('success_message', trans('success_messages.pw_reset'));
                 } else {
                     return Redirect::back()
-                                    ->with('error_message', 'Password reset failed');
+                      ->with('error_message', 'Password reset failed');
                 }
             } else {
                 return Redirect::back()
-                                    ->withErrors(array(
-                                            'invalid_reset_code'=>'The provided password reset code is invalid'
-                                        ));
+                  ->withErrors(array(
+                    'invalid_reset_code' => 'The provided password reset code is invalid'
+                  ));
             }
         } catch (Cartalyst\Sentry\Users\UserNotFoundException $e) {
             return Redirect::back()
-                                ->with('error_message', 'The specified user doesn\'t exist');
+              ->with('error_message', 'The specified user doesn\'t exist');
         }
     }
 
     public function suspendUser($user_id, $created_at)
     {
         $user = Sentry::findUserById($user_id);
-
         if (strtotime($user->created_at) * 1000 == $created_at) {
             $this->user_manager->deactivateUser($user_id);
-
             return Redirect::to('login/backend')
-                                ->with('success_message', trans('success_messages.user_suspend'));
+              ->with('success_message', trans('success_messages.user_suspend'));
         } else {
             return Redirect::to('login/backend')
-                                ->with('error_message', 'The user cannot be suspended.');
+              ->with('error_message', 'The user cannot be suspended.');
         }
     }
 }

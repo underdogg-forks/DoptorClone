@@ -1,4 +1,5 @@
 <?php namespace Components\ReportBuilder\Controllers\Backend;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -19,19 +20,18 @@ use Str;
 use View;
 use Module;
 use PDF;
-
 use Backend\AdminController as BaseController;
 use Components\ReportBuilder\Models\BuiltReport;
 
-class ReportBuilderController extends BaseController {
+class ReportBuilderController extends BaseController
+{
 
     public function __construct()
     {
         parent::__construct();
-
         // Add location hinting for views
         View::addNamespace('report_builders',
-            app_path() . "/../resources/views/{$this->link_type}/{$this->current_theme}/report_builders");
+          app_path() . "/../resources/views/{$this->link_type}/{$this->current_theme}/report_builders");
     }
 
     /**
@@ -40,10 +40,9 @@ class ReportBuilderController extends BaseController {
     public function index()
     {
         $report_builders = BuiltReport::all();
-
         $this->layout->title = trans('cms.report_builders');
         $this->layout->content = View::make('report_builders::index')
-            ->with('report_builders', $report_builders);
+          ->with('report_builders', $report_builders);
     }
 
     /**
@@ -53,10 +52,9 @@ class ReportBuilderController extends BaseController {
     public function create()
     {
         $modules = Module::all();
-
         $this->layout->title = 'Create Report Builder';
         $this->layout->content = View::make('report_builders::create_edit')
-                                        ->with('modules', $modules);
+          ->with('modules', $modules);
     }
 
     /**
@@ -66,22 +64,17 @@ class ReportBuilderController extends BaseController {
     public function store()
     {
         $input = Input::all();
-
         $input = $this->formatInput($input);
-
         $report_builder = BuiltReport::create($input);
-
         Session::put('download_file', $report_builder->id);
         return Redirect::to('backend/report-builder')
-                        ->with('success_message', trans('success_messages.report_builder_create'));
+          ->with('success_message', trans('success_messages.report_builder_create'));
     }
 
     public function edit($id)
     {
         $report_builder = BuiltReport::findOrFail($id);
-
         $modules = Module::all();
-
         $module_ids = array();
         $required_fields = array();
         if ($report_builder->modules != 0) {
@@ -90,61 +83,51 @@ class ReportBuilderController extends BaseController {
                 $required_fields[] = $selected_module['required_fields'];
             }
         }
-
         $module_ids = array_unique($module_ids);
         $required_fields = str_replace('\\', '', json_encode($required_fields));
-
         $this->layout->title = 'Edit Report Builder';
         $this->layout->content = View::make('report_builders::create_edit')
-                                        ->with('report_builder', $report_builder)
-                                        ->with('modules', $modules)
-                                        ->with('required_fields', $required_fields)
-                                        ->with('module_ids', $module_ids);
+          ->with('report_builder', $report_builder)
+          ->with('modules', $modules)
+          ->with('required_fields', $required_fields)
+          ->with('module_ids', $module_ids);
     }
 
     public function update($id)
     {
         $input = Input::all();
-
         $report_builder = BuiltReport::findOrFail($id);
-
         $input = $this->formatInput($input);
-
         $report_builder->update($input);
-
         Session::put('download_file', $id);
         return Redirect::to('backend/report-builder')
-                        ->with('success_message', trans('success_messages.report_builder_update'));
+          ->with('success_message', trans('success_messages.report_builder_update'));
     }
 
-    public function destroy($id=null)
+    public function destroy($id = null)
     {
         // If multiple ids are specified
         if ($id == 'multiple') {
             $selected_ids = trim(Input::get('selected_ids'));
             if ($selected_ids == '') {
                 return Redirect::back()
-                                ->with('error_message', trans('error_messages.nothing_selected_delete'));
+                  ->with('error_message', trans('error_messages.nothing_selected_delete'));
             }
             $selected_ids = explode(' ', $selected_ids);
         } else {
             $selected_ids = array($id);
         }
-
         foreach ($selected_ids as $id) {
             $post = BuiltReport::findOrFail($id);
-
             $post->delete();
         }
-
-       if (count($selected_ids) > 1) {
+        if (count($selected_ids) > 1) {
             $message = trans('success_messages.report_builder_delete');
         } else {
             $message = trans('success_messages.report_builders_delete');
         }
-
         return Redirect::to("backend/report-builder")
-                                ->with('success_message', $message);
+          ->with('success_message', $message);
     }
 
     /**
@@ -155,29 +138,23 @@ class ReportBuilderController extends BaseController {
     public function getModuleFields($id)
     {
         $module = Module::find($id);
-
         $vendor = ($module->vendor) ? $module->vendor . '/' : '';
-        $json_file = app_path() . '/Modules/' . $vendor . $module->alias  . '/module.json';
-
+        $json_file = app_path() . '/Modules/' . $vendor . $module->alias . '/module.json';
         $config = json_decode(file_get_contents($json_file), true);
-
         $fieldAndNames = array();
         foreach ($config['forms'] as $form) {
             $fields = array_combine($form['fields'], $form['field_names']);
             $fields['created_at'] = 'Created At';
             $fields['updated_at'] = 'Updated At';
-
             if (array_key_exists('form_name', $form)) {
                 $form_info = array(
-                        'name'   => $form['form_name'],
-                        'model'  => $form['model'],
-                        'fields' => $fields
-                    );
-
+                  'name' => $form['form_name'],
+                  'model' => $form['model'],
+                  'fields' => $fields
+                );
                 $fieldAndNames[] = $form_info;
             }
         }
-
         return Response::json($fieldAndNames);
     }
 
@@ -192,8 +169,8 @@ class ReportBuilderController extends BaseController {
         $required_fields = array();
         foreach ($input as $key => $value) {
             // Get only the input, that are fields in the module
-            if (str_contains($key, 'fields-'.$i.'_')) {
-                $key = str_replace('fields-'.$i.'_', '', $key);
+            if (str_contains($key, 'fields-' . $i . '_')) {
+                $key = str_replace('fields-' . $i . '_', '', $key);
                 $required_fields[$key] = $value;
             }
         }
@@ -204,40 +181,35 @@ class ReportBuilderController extends BaseController {
     {
         $count = $input['count-value'];
         $modules = array();
-
-        for ($i=1; $i<=$count; $i++) {
-            if (!isset($input['module_id-'.$i])) {
+        for ($i = 1; $i <= $count; $i++) {
+            if (!isset($input['module_id-' . $i])) {
                 continue;
             }
-            $module_id = $input['module_id-'.$i];
-            $model_name = $input['model_name-'.$i];
-            $form_name = $input['form_name-'.$i];
+            $module_id = $input['module_id-' . $i];
+            $model_name = $input['model_name-' . $i];
+            $form_name = $input['form_name-' . $i];
             $module = Module::find($module_id);
             $required_fields = $this->requiredFields($input, $i);
-
             if ($module && !empty($required_fields)) {
                 $model = 'Modules\\' . $module->vendor . '\\' . $module->alias . '\Models\\' . $model_name;
-
                 $modules[] = array(
-                            'id'              => $module_id,
-                            'name'            => $module->name,
-                            'alias'           => $module->alias,
-                            'form_name'       => $form_name,
-                            'model'           => $model,
-                            'required_fields' => $required_fields
-                        );
+                  'id' => $module_id,
+                  'name' => $module->name,
+                  'alias' => $module->alias,
+                  'form_name' => $form_name,
+                  'model' => $model,
+                  'required_fields' => $required_fields
+                );
             }
         }
-
         $output = array(
-                'name'           => $input['name'],
-                'author'         => $input['author'],
-                'version'        => $input['version'],
-                'website'        => $input['website'],
-                'modules'        => $modules,
-                'show_calendars' => isset($input['show_calendars']) ? true : false
-            );
-
+          'name' => $input['name'],
+          'author' => $input['author'],
+          'version' => $input['version'],
+          'website' => $input['website'],
+          'modules' => $modules,
+          'show_calendars' => isset($input['show_calendars']) ? true : false
+        );
         return $output;
     }
 
@@ -248,19 +220,26 @@ class ReportBuilderController extends BaseController {
      */
     private function getReportGenerator($input)
     {
-        if (isset($input['id'])) unset($input['id']);
-        if (isset($input['created_by'])) unset($input['created_by']);
-        if (isset($input['updated_by'])) unset($input['updated_by']);
-        if (isset($input['created_at'])) unset($input['created_at']);
-        if (isset($input['updated_at'])) unset($input['updated_at']);
-
+        if (isset($input['id'])) {
+            unset($input['id']);
+        }
+        if (isset($input['created_by'])) {
+            unset($input['created_by']);
+        }
+        if (isset($input['updated_by'])) {
+            unset($input['updated_by']);
+        }
+        if (isset($input['created_at'])) {
+            unset($input['created_at']);
+        }
+        if (isset($input['updated_at'])) {
+            unset($input['updated_at']);
+        }
         $report_alias = Str::slug($input['name'], '_');
         $report_file = temp_path() . "/report_generator.json";
         file_put_contents($report_file, json_encode($input));
-
         $zip_file = temp_path() . "/report_{$report_alias}.zip";
         Zip(temp_path() . "/report_generator.json", $zip_file, false);
-
         return $zip_file;
     }
 
@@ -273,9 +252,7 @@ class ReportBuilderController extends BaseController {
     {
         Session::forget('download_file');
         $report = BuiltReport::findOrFail($id);
-
         $zip_file = $this->getReportGenerator($report->toArray());
-
         return Response::download($zip_file);
     }
 }

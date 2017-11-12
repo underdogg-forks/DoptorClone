@@ -1,4 +1,5 @@
 <?php namespace Backend;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,7 +10,8 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-class AdminController extends \BaseController {
+class AdminController extends \BaseController
+{
 
     protected $user;
 

@@ -1,9 +1,9 @@
 <?php namespace Modules\Newsletter\Presenters;
 
-use Sentry;
-use Robbo\Presenter\Presenter;
-use Str;
 use Modules\Helpers\String;
+use Robbo\Presenter\Presenter;
+use Sentry;
+use Str;
 
 class ProductPresenter extends Presenter
 {

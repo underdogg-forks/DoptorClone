@@ -1,4 +1,5 @@
 <?php namespace Services;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -9,16 +10,14 @@ License : GNU/GPL, visit LICENSE.txt
 Description :  Doptor is Opensource CMS.
 ===================================================
 */
-
 use Exception;
 use Str;
-
 use Cartalyst\Sentry\Groups\GroupNotFoundException;
 use Sentry;
-
 use UserGroup;
 
-class UserGroupManager {
+class UserGroupManager
+{
 
     /**
      * Find all user groups
@@ -66,10 +65,9 @@ class UserGroupManager {
     public function createUserGroup($input = array())
     {
         $permissions = $this->setPermissions($input);
-
         return Sentry::createGroup(array(
-            'name'        => $input['name'],
-            'permissions' => $permissions
+          'name' => $input['name'],
+          'permissions' => $permissions
         ));
     }
 
@@ -82,12 +80,9 @@ class UserGroupManager {
     public function updateUserGroup($id, $input = array())
     {
         $group = Sentry::findGroupById($id);
-
         $permissions = $this->setPermissions($input);
-
         $group->name = $input['name'];
         $group->permissions = $permissions;
-
         // Update the group
         return $group->save();
     }
@@ -103,17 +98,13 @@ class UserGroupManager {
         try {
             // Find the group using the group id
             $group = Sentry::findGroupById($id);
-
             $users = Sentry::findAllUsersInGroup($group);
-
             if ($users->count() > 0) {
                 throw new Exception('Some users are associated with the selected user group.
                 First change the user group of those users or delete those users.');
             }
-
             // Delete the group
             $group->delete();
-
             $message = trans('success_messages.user_group_delete');
             return $message;
         } catch (GroupNotFoundException $e) {
@@ -142,13 +133,11 @@ class UserGroupManager {
                 $permissions[$abbr . '.edit'] = (isset($input["{$abbr}_edit"])) ? 1 : 0;
                 $permissions[$abbr . '.destroy'] = (isset($input["{$abbr}_destroy"])) ? 1 : 0;
             }
-
             foreach ($access_areas['others'] as $name => $all_permissions) {
                 foreach ((array)$all_permissions as $permission => $desc) {
                     $permissions["{$name}.{$permission}"] = (isset($input["{$name}_{$permission}"])) ? 1 : 0;
                 }
             }
-
             foreach ($access_areas['modules'] as $alias => $name) {
                 $alias_lower = Str::lower($alias);
                 $permissions["modules.{$alias_lower}.index"] = (isset($input["modules_{$alias}_index"])) ? 1 : 0;
@@ -158,7 +147,6 @@ class UserGroupManager {
                 $permissions["modules.{$alias_lower}.destroy"] = (isset($input["modules_{$alias}_destroy"])) ? 1 : 0;
             }
         }
-
         return $permissions;
     }
 }

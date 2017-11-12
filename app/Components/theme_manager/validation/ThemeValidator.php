@@ -1,4 +1,5 @@
 <?php namespace Components\ThemeManager\Validation;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,14 +12,15 @@ Description :  Doptor is Opensource CMS.
 */
 use Services\Validation\Validator as Validator;
 
-class ThemeValidator extends Validator {
+class ThemeValidator extends Validator
+{
 
     /**
      * Default rules
      * @var array
      */
     protected $rules = array(
-        'file' => 'image|max:3000',
+      'file' => 'image|max:3000',
     );
 
     /**
@@ -26,13 +28,12 @@ class ThemeValidator extends Validator {
      * @var array
      */
     protected $updateRules = array(
-        'file' => 'image|max:3000',
+      'file' => 'image|max:3000',
     );
 
     /**
      * Messages for validation
      * @var array
      */
-    protected $message = array(
-    );
+    protected $message = array();
 }

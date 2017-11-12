@@ -1,4 +1,5 @@
 <?php namespace Backend;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -12,14 +13,14 @@ Description :  Doptor is Opensource CMS.
 use App, Input, Slideshow, Redirect, Request, Sentry, Str, View, File;
 use Services\Validation\ValidationException as ValidationException;
 
-class SynchronizeController extends AdminController {
+class SynchronizeController extends AdminController
+{
 
     public function __construct()
     {
         @ini_set('max_execution_time', 300);     // Temporarily increase maximum execution time
         parent::__construct();
         $this->current_time = date("Y-m-d-H-i-s");
-
         $this->backup_file = backup_path() . "/backup_{$this->current_time}.zip";
         $this->restore_file = restore_path() . "/backup_{$this->current_time}.zip";
     }
@@ -32,13 +33,13 @@ class SynchronizeController extends AdminController {
     public function getIndex()
     {
         $this->layout->title = 'Synchronize';
-        $this->layout->content = \View::make($this->link_type.'.'.$this->current_theme.'.synchronize.index');
+        $this->layout->content = \View::make($this->link_type . '.' . $this->current_theme . '.synchronize.index');
     }
 
     public function getLocalToWeb()
     {
         $this->layout->title = 'Synchronize Local to Web';
-        $this->layout->content = \View::make($this->link_type.'.'.$this->current_theme.'.synchronize.localtoweb');
+        $this->layout->content = \View::make($this->link_type . '.' . $this->current_theme . '.synchronize.localtoweb');
     }
 
     public function postLocalToWeb()
@@ -50,7 +51,7 @@ class SynchronizeController extends AdminController {
     public function getWebToLocal()
     {
         $this->layout->title = 'Synchronize Web to Local';
-        $this->layout->content = \View::make($this->link_type.'.'.$this->current_theme.'.synchronize.webtolocal');
+        $this->layout->content = \View::make($this->link_type . '.' . $this->current_theme . '.synchronize.webtolocal');
     }
 
     public function postWebToLocal()
@@ -62,33 +63,28 @@ class SynchronizeController extends AdminController {
     public function postSyncFromFile()
     {
         $synchronizer = new \Services\Synchronize($this);
-
         $restore_file = $synchronizer->copyToRestore(Input::all());
-
         $synchronizer->restore($restore_file);
-
         return Redirect::to('/');
     }
 
     public function postSyncToFile()
     {
         $synchronizer = new \Services\Synchronize($this);
-
         $synchronizer->startBackup();
-
         return \Response::download($this->backup_file, "backup_{$this->current_time}.zip");
     }
 
     public function syncSucceeds($message)
     {
         return Redirect::to('backend/synchronize')
-                        ->with('success_message', $message);
+          ->with('success_message', $message);
     }
 
     public function syncFails($errors, $redirect_to)
     {
         return Redirect::to($redirect_to)
-                        ->withInput()
-                        ->with('error_message', $errors);
+          ->withInput()
+          ->with('error_message', $errors);
     }
 }

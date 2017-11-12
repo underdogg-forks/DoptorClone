@@ -1,4 +1,5 @@
 <?php namespace Components\ContactManager\Presenters;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -19,7 +20,7 @@ class ContactPresenter extends Presenter
      * Get the page's excerpt
      * @return string
      */
-    public function excerpt($length=80)
+    public function excerpt($length = 80)
     {
         if (strpos($this->content, '<!--more-->')) {
             list($excerpt, $more) = explode('<!--more-->', $this->content);
@@ -33,7 +34,7 @@ class ContactPresenter extends Presenter
      * Get all the categories that a post lies in
      * @return string
      */
-    public function selected_categories($field='id')
+    public function selected_categories($field = 'id')
     {
         $ret = array();
         foreach ($this->categories as $category) {

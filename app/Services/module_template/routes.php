@@ -10,6 +10,6 @@ Description     :   DescriptionOfTheModule
 */
 $current_dir = Str::snake(basename(__DIR__), '_');
 $current_module = "\\" . Str::title(basename(__DIR__));
-
 // Backend routes
-***ROUTES***
+***
+ROUTES ***

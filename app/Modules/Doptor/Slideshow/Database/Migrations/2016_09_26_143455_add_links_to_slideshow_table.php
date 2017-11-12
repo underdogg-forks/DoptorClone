@@ -1,7 +1,6 @@
 <?php
-
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddLinksToSlideshowTable extends Migration
 {
@@ -12,7 +11,7 @@ class AddLinksToSlideshowTable extends Migration
      */
     public function up()
     {
-        Schema::table('slideshow', function(Blueprint $table) {
+        Schema::table('slideshow', function (Blueprint $table) {
             $table->string('link_title')->nullable()->after('image');
             $table->string('link')->nullable()->after('link_title');
             $table->string('link_manual')->nullable()->after('link');
@@ -26,7 +25,7 @@ class AddLinksToSlideshowTable extends Migration
      */
     public function down()
     {
-        Schema::table('slideshow', function(Blueprint $table) {
+        Schema::table('slideshow', function (Blueprint $table) {
             $table->dropColumn('link_title');
             $table->dropColumn('link');
             $table->dropColumn('link_manual');

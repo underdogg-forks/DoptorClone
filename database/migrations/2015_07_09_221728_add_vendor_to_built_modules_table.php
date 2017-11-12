@@ -1,7 +1,6 @@
 <?php
-
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class AddVendorToBuiltModulesTable extends Migration
 {
@@ -12,7 +11,7 @@ class AddVendorToBuiltModulesTable extends Migration
      */
     public function up()
     {
-        Schema::table('built_modules', function(Blueprint $table) {
+        Schema::table('built_modules', function (Blueprint $table) {
             $table->string('vendor')->nullable()->after('author');
         });
     }
@@ -24,7 +23,7 @@ class AddVendorToBuiltModulesTable extends Migration
      */
     public function down()
     {
-        Schema::table('built_modules', function(Blueprint $table) {
+        Schema::table('built_modules', function (Blueprint $table) {
             $table->dropColumn('vendor');
         });
     }

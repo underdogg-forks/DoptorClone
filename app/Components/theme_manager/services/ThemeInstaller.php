@@ -1,4 +1,5 @@
 <?php namespace Components\ThemeManager\Services;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,12 +12,12 @@ Description :  Doptor is Opensource CMS.
 */
 use Artisan, App, Exception, File, Input, Str, View, Redirect, Response, Validator;
 use Sentry;
-
 use Module;
 use Theme;
 use \Services\ModuleInstaller;
 
-class ThemeInstaller {
+class ThemeInstaller
+{
 
     protected $listener;
     protected $file;
@@ -27,7 +28,6 @@ class ThemeInstaller {
     public function __construct($listener, $input)
     {
         $this->listener = $listener;
-
         $this->target = $input['target'];
         $this->file = isset($input['file']) ? $input['file'] : null;
         $this->install_sample_data = isset($input['install_sample_data']) && $input['install_sample_data'];
@@ -39,28 +39,22 @@ class ThemeInstaller {
             $this->full_path = $this->extractToTemporary();
             $success = $this->getAndCheckConfig();
             $this->copyFiles();
-
             $this->copyScreenshot();
-
             $theme = Theme::create(array(
-                    'name'         => $this->config['name'],
-                    'version'      => $this->config['version'],
-                    'author'       => $this->config['author'],
-                    'description'  => $this->config['description'],
-                    'directory'    => $this->config['directory'],
-                    'screenshot'   => $this->screenshot,
-                    'target'       => $this->target,
-                    'has_settings' => $this->has_settings
-                ));
-
+              'name' => $this->config['name'],
+              'version' => $this->config['version'],
+              'author' => $this->config['author'],
+              'description' => $this->config['description'],
+              'directory' => $this->config['directory'],
+              'screenshot' => $this->screenshot,
+              'target' => $this->target,
+              'has_settings' => $this->has_settings
+            ));
             $this->installModules();
-
             if ($this->install_sample_data) {
                 $this->installSampleData($theme);
             }
-
             $this->cleanup();
-
             return $this->listener->installerSucceeds('backend/theme-manager', 'The theme was installed successfully');
         } catch (Exception $e) {
             return $this->listener->installerFails($e->getMessage());
@@ -71,26 +65,18 @@ class ThemeInstaller {
     {
         $this->filename = $this->file->getClientOriginalName();
         $extension = $this->file->getClientOriginalExtension();
-
         if ($extension == '') {
             $this->filename = $this->filename . '.zip';
             $extension = 'zip';
         }
-
-        $temp_directory = str_replace('.'.$extension, '', $this->filename);
-
+        $temp_directory = str_replace('.' . $extension, '', $this->filename);
         // Upload the theme zip file to temporary folder
         $uploadSuccess = Input::file('file')->move(temp_path() . '/', $this->filename);
-
         $file = temp_path() . '/' . $this->filename;
-
         // get the absolute path to $file
         // $path = pathinfo(realpath($file), PATHINFO_DIRNAME) . '/';
-
         $full_path = pathinfo(realpath($file), PATHINFO_DIRNAME) . '/' . $temp_directory . '/';
-
         $unzipSuccess = $this->Unzip($file, $full_path);
-
         return $full_path;
     }
 
@@ -104,13 +90,10 @@ class ThemeInstaller {
         if (!isset($this->config['directory'])) {
             throw new Exception('No directory was specified in the theme.json file inside the theme package. <br> A directory containing the theme files must be specified in the theme package.');
         }
-
         if (!File::exists("{$this->full_path}{$this->config['directory']}/")) {
             throw new Exception('The directory specified in the theme.json was not found in the theme package.');
         }
-
         $this->theme_directory = $this->config['directory'];
-
         $this->has_settings = isset($this->config['has_settings']) ? $this->config['has_settings'] : false;
     }
 
@@ -120,9 +103,10 @@ class ThemeInstaller {
      */
     protected function copyFiles()
     {
-        $status = File::copyDirectory("{$this->full_path}{$this->theme_directory}/views/", base_path() . '/resources/views/' . $this->target . '/' . $this->theme_directory . '/');
-
-        File::copyDirectory("{$this->full_path}{$this->theme_directory}/assets/", public_path() . '/assets/' . $this->target . '/' . $this->theme_directory . '/');
+        $status = File::copyDirectory("{$this->full_path}{$this->theme_directory}/views/",
+          base_path() . '/resources/views/' . $this->target . '/' . $this->theme_directory . '/');
+        File::copyDirectory("{$this->full_path}{$this->theme_directory}/assets/",
+          public_path() . '/assets/' . $this->target . '/' . $this->theme_directory . '/');
     }
 
     protected function copyScreenshot()
@@ -133,10 +117,8 @@ class ThemeInstaller {
             $this->screenshot = '';
             return;
         }
-
         File::exists(public_path() . '/uploads/') || File::makeDirectory(public_path() . '/uploads/');
         File::exists(public_path() . '/uploads/themes/') || File::makeDirectory(public_path() . '/uploads/themes/');
-
         File::copy($this->full_path . $this->config['screenshot'], public_path() . '/' . $this->screenshot);
     }
 
@@ -148,16 +130,12 @@ class ThemeInstaller {
         if (!isset($this->config['modules'])) {
             return false;
         }
-
         $modules = $this->config['modules'];
-
         $module_installer = new ModuleInstaller;
-
         foreach ($modules as $module) {
             $module_dir = "{$this->full_path}modules/{$module}/";
             if (file_exists($module_dir) && file_exists($module_dir . 'module.json')) {
                 $module_data = $module_installer->installModule($module_dir);
-
                 if ($module = Module::where('alias', '=', $module_data['alias'])->first()) {
                     $module->update($module_data);
                 } else {
@@ -173,9 +151,7 @@ class ThemeInstaller {
     protected function installSampleData($theme)
     {
         $this->backupDatabase();
-
         $this->seedDatabase($theme);
-
         $this->copySampleUploads();
     }
 
@@ -184,14 +160,10 @@ class ThemeInstaller {
         if (!File::exists(stored_backups_path())) {
             File::makeDirectory(stored_backups_path());
         }
-
         $this->current_time = date("Y-m-d-H-i-s");
         $this->backup_file = stored_backups_path() . "/backup_{$this->current_time}.zip";
-
         $synchronizer = new \Services\Synchronize($this);
-
         $synchronizer->startBackup(true, false, false);
-
         $backup_description = 'Backup created before installing ' . $this->config['name'];
         $synchronizer->saveBackupToDB($backup_description);
     }
@@ -202,7 +174,6 @@ class ThemeInstaller {
     protected function seedDatabase($theme)
     {
         $seed_dir = $this->full_path . 'sample_data/seeds';
-
         if (File::files($seed_dir)) {
             foreach (File::files($seed_dir) as $file) {
                 require_once($file);
@@ -218,10 +189,8 @@ class ThemeInstaller {
     protected function copySampleUploads()
     {
         $theme_sample_uploads = $this->full_path . 'sample_data/uploads';
-
         if (File::exists($theme_sample_uploads)) {
             $sample_uploads_dir = public_path('uploads/sample/' . $this->config['directory']);
-
             File::copyDirectory($theme_sample_uploads, $sample_uploads_dir);
         }
     }
@@ -241,15 +210,13 @@ class ThemeInstaller {
         //     return \Redirect::to('backend/modules')
         //                         ->with('error_message', "Can't read input file");
         // }
-
         // if(!is_dir($path) || !is_writable($path)) {
         //     return \Redirect::to('backend/modules')
         //                         ->with('error_message', "Can't write to target");
         // }
-
         $zip = new \ZipArchive;
         $res = $zip->open($file);
-        if ($res === TRUE) {
+        if ($res === true) {
             // extract it to the path we determined above
             try {
                 $zip->extractTo($path);

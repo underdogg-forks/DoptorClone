@@ -4,7 +4,7 @@
     <div class="row">
       <!-- BEGIN BOTTOM ABOUT BLOCK -->
       <div class="col-md-12">
-          {!! Services\MenuManager::generate('public-bottom-menu') !!}
+        {!! Services\MenuManager::generate('public-bottom-menu') !!}
       </div>
     </div>
   </div>

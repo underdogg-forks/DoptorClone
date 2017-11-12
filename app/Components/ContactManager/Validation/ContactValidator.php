@@ -1,4 +1,5 @@
 <?php namespace Components\ContactManager\Validation;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,14 +12,15 @@ Description :  Doptor is Opensource CMS.
 */
 use Services\Validation\Validator as Validator;
 
-class ContactValidator extends Validator {
+class ContactValidator extends Validator
+{
 
     /**
      * Default rules
      * @var array
      */
     protected $rules = array(
-        'name'       => 'required',
+      'name' => 'required',
     );
 
     /**
@@ -26,7 +28,7 @@ class ContactValidator extends Validator {
      * @var array
      */
     protected $updateRules = array(
-        'name'       => 'required',
+      'name' => 'required',
     );
 
     /**
@@ -34,7 +36,7 @@ class ContactValidator extends Validator {
      * @var array
      */
     protected $message = array(
-        'alias.unique' => 'The alias has already been taken'
+      'alias.unique' => 'The alias has already been taken'
     );
 
     public function validateForCreation($input)
@@ -45,7 +47,6 @@ class ContactValidator extends Validator {
     public function validateForUpdate($input)
     {
         $this->updateRules['alias'] .= ',' . $input['id'];
-
         return $this->validate($input, $this->updateRules, $this->message);
     }
 }

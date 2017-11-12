@@ -1,4 +1,5 @@
 <?php namespace Services;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -16,12 +17,11 @@ use Input;
 use Sentry;
 use Str;
 use URL;
-
 use Cartalyst\Sentry\Users\UserNotFoundException;
 use User;
 
-
-class UserManager {
+class UserManager
+{
 
     /**
      * Find all users
@@ -34,7 +34,6 @@ class UserManager {
             $user->user_groups = $this->getUserGroups($user, 'name');
             $user->is_banned = $this->isBanned($user->id);
         }
-
         return $users;
     }
 
@@ -50,7 +49,6 @@ class UserManager {
         $user->company_id = json_decode($user->company_id);
         $user->user_groups = $this->getUserGroups($user, $group_field);
         $user->is_banned = $this->isBanned($user->id);
-
         return $user;
     }
 
@@ -63,25 +61,22 @@ class UserManager {
     public function createUser($input = array())
     {
         $photo = (isset($input['photo']) && $input['photo']) ? $this->uploadImage($input['photo']) : '';
-
         $user = Sentry::createUser(array(
-            'username'          => $input['username'],
-            'email'             => $input['email'],
-            'password'          => $input['password'],
-            'photo'             => $photo,
-            'first_name'        => $input['first_name'],
-            'last_name'         => $input['last_name'],
-            'company_id'        => isset($input['company_id']) ? json_encode($input['company_id']) : null,
-            'security_question' => isset($input['security_question']) ? $input['security_question'] : '',
-            'security_answer'   => isset($input['security_answer']) ? $input['security_answer'] : '',
-            'auto_logout_time'  => $input['auto_logout_time'],
-            'last_pw_changed'   => date('Y-m-d h:i:s'),
-            'activated'         => 1,
+          'username' => $input['username'],
+          'email' => $input['email'],
+          'password' => $input['password'],
+          'photo' => $photo,
+          'first_name' => $input['first_name'],
+          'last_name' => $input['last_name'],
+          'company_id' => isset($input['company_id']) ? json_encode($input['company_id']) : null,
+          'security_question' => isset($input['security_question']) ? $input['security_question'] : '',
+          'security_answer' => isset($input['security_answer']) ? $input['security_answer'] : '',
+          'auto_logout_time' => $input['auto_logout_time'],
+          'last_pw_changed' => date('Y-m-d h:i:s'),
+          'activated' => 1,
         ));
-
         // Assign user groups
         $this->addUserToGroup($input['user-group'], $user);
-
         return $user;
     }
 
@@ -95,9 +90,7 @@ class UserManager {
     public function updateUser($id, $input = array())
     {
         $input['id'] = $id;
-
         $user = Sentry::findUserById($id);
-
         $photo = (isset($input['photo']) && $input['photo']) ? $this->uploadImage($input['photo']) : $user->photo;
         // Update the user details
         $user->username = $input['username'];
@@ -118,7 +111,6 @@ class UserManager {
         }
         $user->auto_logout_time = $input['auto_logout_time'];
         $user->save();
-
         if (isset($input['user-group']) && !Str::contains(URL::previous(), '/profiles/')) {
             // Remove previous groups
             foreach ($this->getUserGroups($user) as $group) {
@@ -148,20 +140,16 @@ class UserManager {
             } else {
                 $selected_ids = array($id);
             }
-
             if (in_array(current_user()->id, $selected_ids)) {
                 throw new Exception('You can not delete yourself.');
             }
-
             foreach ($selected_ids as $id) {
                 // Delete the user using the user id
                 $user = Sentry::findUserById($id);
                 $user->delete();
             }
-
             $translation = (count($selected_ids) > 1) ? 'users_delete' : 'user_delete';
             $message = trans('success_messages.' . $translation);
-
             return $message;
         } catch (Cartalyst\Sentry\Users\UserNotFoundException $e) {
             throw new Exception(trans('error_messages.users_find'));
@@ -180,29 +168,21 @@ class UserManager {
             return $file;
         }
         $images_path = User::$images_path;
-
         File::exists(public_path() . '/uploads/') || File::makeDirectory(public_path() . '/uploads/');
         File::exists(public_path() . '/' . $images_path) || File::makeDirectory(public_path() . '/' . $images_path);
-
         $file_name = $file->getClientOriginalName();
-
         $file_ext = File::extension($file_name);
         $only_fname = str_replace('.' . $file_ext, '', $file_name);
-
         // Add random characters to filename
         $file_name = $only_fname . '_' . str_random(8) . '.' . $file_ext;
-
         $image = Image::make($file->getRealPath());
-
         if ($id) {
             // If user is being edited, delete old image
             $old_image = Sentry::findUserById($id)->photo;
             File::exists($old_image) && File::delete($old_image);
         }
-
         $image->fit(128, 128)
-            ->save($images_path . $file_name);
-
+          ->save($images_path . $file_name);
         return $images_path . '/' . $file_name;
     }
 
@@ -227,7 +207,6 @@ class UserManager {
                 $groups[] = $group->{$value};
             }
         }
-
         return $groups;
     }
 
@@ -242,7 +221,6 @@ class UserManager {
         try {
             // Find the user using the user id
             $throttle = Sentry::findThrottlerByUserId($id);
-
             // UnBan the user
             $throttle->UnBan();
         } catch (Cartalyst\Sentry\Users\UserNotFoundException $e) {
@@ -264,7 +242,6 @@ class UserManager {
         try {
             // Find the user using the user id
             $throttle = Sentry::findThrottlerByUserId($id);
-
             // Ban the user
             $throttle->ban();
         } catch (Cartalyst\Sentry\Users\UserNotFoundException $e) {
@@ -280,7 +257,6 @@ class UserManager {
     public function isBanned($id)
     {
         $throttle = Sentry::findThrottlerByUserId($id);
-
         if ($throttle->isBanned()) {
             // User is Banned
             return true;

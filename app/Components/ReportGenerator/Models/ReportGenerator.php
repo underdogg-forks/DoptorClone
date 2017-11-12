@@ -1,4 +1,5 @@
 <?php namespace Components\ReportGenerator\Models;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -12,7 +13,8 @@ Description :  Doptor is Opensource CMS.
 use Eloquent;
 use Str;
 
-class ReportGenerator extends Eloquent {
+class ReportGenerator extends Eloquent
+{
 
     protected $table = 'report_generators';
 

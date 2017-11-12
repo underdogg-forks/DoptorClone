@@ -1,4 +1,5 @@
 <nav class="primary">
-    {!! Services\MenuManager::generate('public-top-menu', 'sf-menu') !!}
+Hello world
+  {!! Services\MenuManager::generate('public-top-menu', 'sf-menu') !!}
 
 </nav>

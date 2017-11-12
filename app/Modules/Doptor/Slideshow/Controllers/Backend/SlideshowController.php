@@ -1,4 +1,5 @@
 <?php namespace Modules\Doptor\Slideshow\Controllers\Backend;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -14,21 +15,19 @@ use File;
 use Input;
 use Redirect;
 use View;
-
 use Sentry;
-
 use Backend\AdminController;
 use Services\Validation\ValidationException as ValidationException;
 use Modules\Doptor\Slideshow\Models\Slideshow;
 
-class SlideshowController extends AdminController {
+class SlideshowController extends AdminController
+{
 
     public function __construct()
     {
         parent::__construct();
-
         View::addNamespace('slideshow',
-            app_path() . "/Modules/Doptor/Slideshow/Views");
+          app_path() . "/Modules/Doptor/Slideshow/Views");
     }
 
     /**
@@ -38,11 +37,9 @@ class SlideshowController extends AdminController {
     public function index()
     {
         $slides = Slideshow::all();
-
         $this->layout->title = 'All Slides';
-
         $this->layout->content = View::make('slideshow::slideshow.index')
-            ->with('slides', $slides);
+          ->with('slides', $slides);
     }
 
     /**
@@ -52,11 +49,9 @@ class SlideshowController extends AdminController {
     public function create()
     {
         $this->layout->title = 'New slide';
-
         $all_statuses = Slideshow::all_status();
-
         $this->layout->content = View::make('slideshow::slideshow.create_edit')
-            ->with('all_statuses', $all_statuses);
+          ->with('all_statuses', $all_statuses);
     }
 
     /**
@@ -67,13 +62,11 @@ class SlideshowController extends AdminController {
     {
         $input = Input::all();
         $input['created_by'] = Sentry::getUser()->id;
-
         try {
             $slide = new Slideshow($input);
             $slide->save();
-
             return Redirect::route("{$this->link_type}.modules.doptor.slideshow.index")
-                ->with('success_message', trans('success_messages.slide_create'));
+              ->with('success_message', trans('success_messages.slide_create'));
         } catch (ValidationException $e) {
             return Redirect::back()->withInput()->withErrors($e->getErrors());
         }
@@ -99,12 +92,10 @@ class SlideshowController extends AdminController {
     public function edit($id)
     {
         $this->layout->title = 'Edit slide';
-
         $all_statuses = Slideshow::all_status();
-
         $this->layout->content = View::make('slideshow::slideshow.create_edit')
-            ->with('slide', Slideshow::findOrFail($id))
-            ->with('all_statuses', $all_statuses);
+          ->with('slide', Slideshow::findOrFail($id))
+          ->with('all_statuses', $all_statuses);
     }
 
     /**
@@ -117,14 +108,11 @@ class SlideshowController extends AdminController {
     {
         $input = Input::all();
         $input['updated_by'] = Sentry::getUser()->id;
-
         try {
             $slide = Slideshow::findOrFail($id);
-
             $slide->update($input);
-
             return Redirect::route("{$this->link_type}.modules.doptor.slideshow.index")
-                ->with('success_message', trans('success_messages.slide_update'));
+              ->with('success_message', trans('success_messages.slide_update'));
         } catch (ValidationException $e) {
             return Redirect::back()->withInput()->withErrors($e->getErrors());
         }
@@ -139,15 +127,13 @@ class SlideshowController extends AdminController {
     public function destroy($id)
     {
         $slide = Slideshow::findOrFail($id);
-
         File::exists($slide->image) && File::delete($slide->image);
-
         if ($slide->delete()) {
             return Redirect::route("{$this->link_type}.modules.doptor.slideshow.index")
-                ->with('success_message', trans('success_messages.slide_delete'));
+              ->with('success_message', trans('success_messages.slide_delete'));
         } else {
             return Redirect::route("{$this->link_type}.modules.doptor.slideshow.index")
-                ->with('error_message', trans('error_messages.slide_delete'));
+              ->with('error_message', trans('error_messages.slide_delete'));
         }
     }
 

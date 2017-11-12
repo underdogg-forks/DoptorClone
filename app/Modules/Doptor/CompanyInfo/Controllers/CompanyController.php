@@ -1,4 +1,5 @@
 <?php namespace Modules\Doptor\CompanyInfo\Controllers;
+
 /*
 =================================================
 Module Name     :   Company Info
@@ -13,11 +14,11 @@ use Input;
 use Redirect;
 use Str;
 use View;
-
 use Backend\AdminController as BaseController;
 use Services\Validation\ValidationException as ValidationException;
 
-class CompanyController extends CompanyBaseController {
+class CompanyController extends CompanyBaseController
+{
 
     public function __construct()
     {
@@ -32,33 +33,24 @@ class CompanyController extends CompanyBaseController {
     {
         $router = app()->make('router');
         $route = $router->currentRouteName() ?: $router->current()->getPath();
-
         // Enable tabbed view for company_info only
         $tabbed_view = (ends_with($route, 'company_info'));
-
         $vendor = Str::lower($this->module_vendor);
-
         $company_model = $this->module_namespace . 'Models\\Company';
         $company_branch_model = $this->module_namespace . 'Models\\CompanyBranch';
-
         $companies = $company_model::with('country')->get();
-
         $company_branches = $company_branch_model::with('country');
-
         if (current_user_companies()) {
             $company_branches = $company_branches->where('company_id', current_user_companies());
         }
-
         $company_branches = $company_branches->get();
-
         $title = 'All Companies and Company Branches';
-
         $this->layout->title = $title;
         $this->layout->content = View::make("{$this->module_alias}::companies.{$this->type}.index")
-            ->with('title', $title)
-            ->with('companies', $companies)
-            ->with('company_branches', $company_branches)
-            ->with('tabbed_view', $tabbed_view);
+          ->with('title', $title)
+          ->with('companies', $companies)
+          ->with('company_branches', $company_branches)
+          ->with('tabbed_view', $tabbed_view);
     }
 
     /**
@@ -70,14 +62,12 @@ class CompanyController extends CompanyBaseController {
     {
         $country_model = $this->module_namespace . 'Models\\Country';
         $countries = $country_model::names();
-
         $title = "Add New Company";
-
         $this->layout->title = $title;
         $this->layout->content = View::make("{$this->module_alias}::companies.{$this->type}.create_edit")
-            ->with('title', $title)
-            ->with('countries', $countries)
-            ->with('incharge_count', 1);
+          ->with('title', $title)
+          ->with('countries', $countries)
+          ->with('incharge_count', 1);
     }
 
     /**
@@ -87,25 +77,20 @@ class CompanyController extends CompanyBaseController {
     public function store()
     {
         $input = Input::all();
-
         $incharges = $this->fixInchargeData($input['incharge']);
-
         if (isset($input['form_close'])) {
             return Redirect::to("{$this->link}modules/{$this->module_link}");
         }
-
         if (isset($input['form_save'])) {
             $redirect = "{$this->link}modules/{$this->module_link}";
         } else {
             $redirect = "{$this->link}modules/{$this->module_link}/companies/create";
         }
-
         if ($this->module_vendor) {
             $company_model = "Modules\\{$this->module_vendor}\\{$this->module_alias}\\Models\\Company";
         } else {
             $company_model = "Modules\\{$this->module_alias}\\Models\\Company";
         }
-
         try {
             $company = $company_model::create($input);
             foreach ($incharges as $incharge) {
@@ -114,13 +99,12 @@ class CompanyController extends CompanyBaseController {
         } catch (ValidationException $e) {
             return Redirect::back()->withInput()->withErrors($e->getErrors());
         }
-
         if ($company) {
             return Redirect::to($redirect)
-                ->with('success_message', trans('success_messages.company_create'));
+              ->with('success_message', trans('success_messages.company_create'));
         } else {
             return Redirect::back()
-                ->with('error_message', trans('error_messages.company_create'));
+              ->with('error_message', trans('error_messages.company_create'));
         }
     }
 
@@ -134,13 +118,11 @@ class CompanyController extends CompanyBaseController {
     {
         $company_model = $this->module_namespace . "Models\\Company";
         $company = $company_model::findOrFail($id);
-
         $title = "Showing Company: {$company->name}";
-
         $this->layout->title = $title;
         $this->layout->content = View::make("{$this->module_alias}::companies.{$this->type}.show")
-            ->with('title', $title)
-            ->with('company', $company);
+          ->with('title', $title)
+          ->with('company', $company);
     }
 
     /**
@@ -161,19 +143,15 @@ class CompanyController extends CompanyBaseController {
         }
         $country_model = $this->module_namespace . 'Models\\Country';
         $countries = $country_model::names();
-
         $company = $company_model::with('incharges')->findOrFail($id);
-        $incharge_count = ($company->incharges->count() ? : 1);
-
+        $incharge_count = ($company->incharges->count() ?: 1);
         $title = "Edit Company";
-
         $this->layout->title = $title;
-
         $this->layout->content = View::make("{$this->module_alias}::companies.{$this->type}.create_edit")
-            ->with('title', $title)
-            ->with('company', $company)
-            ->with('incharge_count', $incharge_count)
-            ->with('countries', $countries);
+          ->with('title', $title)
+          ->with('company', $company)
+          ->with('incharge_count', $incharge_count)
+          ->with('countries', $countries);
     }
 
     /**
@@ -188,22 +166,17 @@ class CompanyController extends CompanyBaseController {
             abort(501);
         }
         $input = Input::all();
-
         $incharges = $this->fixInchargeData($input['incharge']);
-
         if (isset($input['form_close'])) {
             return Redirect::to("{$this->link}modules/{$this->module_link}");
         }
-
         if (isset($input['form_save'])) {
             $redirect = "{$this->link}modules/{$this->module_link}";
         } else {
             $redirect = "{$this->link}modules/{$this->module_link}/companies/create";
         }
-
         $company_model = $this->module_namespace . "Models\\Company";
         $country_model = $this->module_namespace . 'Models\\Country';
-
         try {
             $company = $company_model::find($id);
             $company->update($input);
@@ -220,13 +193,12 @@ class CompanyController extends CompanyBaseController {
         } catch (ValidationException $e) {
             return Redirect::back()->withInput()->withErrors($e->getErrors());
         }
-
         if ($company) {
             return Redirect::to($redirect)
-                ->with('success_message', trans('success_messages.company_delete'));
+              ->with('success_message', trans('success_messages.company_delete'));
         } else {
             return Redirect::back()
-                ->with('error_message', trans('error_messages.company_delete'));
+              ->with('error_message', trans('error_messages.company_delete'));
         }
     }
 
@@ -243,30 +215,25 @@ class CompanyController extends CompanyBaseController {
             $selected_ids = trim(Input::get('selected_ids'));
             if ($selected_ids == '') {
                 return Redirect::back()
-                    ->with('error_message', trans('error_messages.nothing_selected_delete'));
+                  ->with('error_message', trans('error_messages.nothing_selected_delete'));
             }
             $selected_ids = explode(' ', $selected_ids);
         } else {
             $selected_ids = array($id);
         }
-
         $company_model = $this->module_namespace . "Models\\Company";
-
         foreach ($selected_ids as $id) {
             if (can_user_access_company($id)) {
                 $company = $company_model::findOrFail($id);
-
                 $company->delete();
             }
         }
-
         if (count($selected_ids) > 1) {
             $message = trans('success_messages.companies_delete');
         } else {
             $message = trans('success_messages.company_delete');
         }
-
         return Redirect::back()
-            ->with('success_message', $message);
+          ->with('success_message', $message);
     }
 }

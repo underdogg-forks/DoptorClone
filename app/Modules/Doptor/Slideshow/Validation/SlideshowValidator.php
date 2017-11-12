@@ -1,4 +1,5 @@
 <?php namespace Modules\Doptor\Slideshow\Validation;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,30 +12,29 @@ Description :  Doptor is Opensource CMS.
 */
 use Services\Validation\Validator as Validator;
 
-class SlideshowValidator extends Validator {
+class SlideshowValidator extends Validator
+{
 
     /**
      * Default rules
      * @var array
      */
     protected $rules = array(
-        'image'     => 'alpha_spaces|required'
+      'image' => 'alpha_spaces|required'
     );
 
     /**
      * Default rules for update
      * @var array
      */
-    protected $updateRules = array(
-        // 'image'     => 'required'
+    protected $updateRules = array(// 'image'     => 'required'
     );
 
     /**
      * Messages for validation
      * @var array
      */
-    protected $message = array(
-    );
+    protected $message = array();
 
     public function validateForCreation($input)
     {
@@ -42,7 +42,6 @@ class SlideshowValidator extends Validator {
             $this->rules['publish_start'] = 'before:'.$input['publish_end'];
             $this->rules['publish_end'] = 'after:'.$input['publish_start'];
         }*/
-
         return $this->validate($input, $this->rules, $this->message);
     }
 
@@ -52,7 +51,6 @@ class SlideshowValidator extends Validator {
             $this->updateRules['publish_start'] = 'before:'.$input['publish_end'];
             $this->updateRules['publish_end'] = 'after:'.$input['publish_start'];
         }*/
-
         return $this->validate($input, $this->updateRules, $this->message);
     }
 }

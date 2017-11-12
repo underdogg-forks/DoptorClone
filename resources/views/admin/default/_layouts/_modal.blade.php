@@ -4,30 +4,30 @@
 
 <head id="Starter-Site">
 
-    <title>{{ $title }} :: {!! trans('cms.admin_dashboard') !!}</title>
+  <title>{{ $title }} :: {!! trans('cms.admin_dashboard') !!}</title>
 
-    @section('styles')
-        {{-- Here goes the page level styles --}}
-    @show
-    <link rel="shortcut icon" href="{!!URL::to("assets/favicon.ico")!!}">
+  @section('styles')
+    {{-- Here goes the page level styles --}}
+  @show
+  <link rel="shortcut icon" href="{!!URL::to("assets/favicon.ico")!!}">
 
 </head>
 
 <body>
-    <!-- Container -->
-    <div class="admin-modal modal-body">
+<!-- Container -->
+<div class="admin-modal modal-body">
 
-        <div class="container-fluid">
-            @yield('content')
-        </div>
+  <div class="container-fluid">
+    @yield('content')
+  </div>
 
-    </div>
-    <!-- ./ container -->
+</div>
+<!-- ./ container -->
 
-    <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
-    @section('scripts')
-        {{-- Here goes the page level scripts --}}
-    @show
+<!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+@section('scripts')
+  {{-- Here goes the page level scripts --}}
+@show
 
 </body>
 

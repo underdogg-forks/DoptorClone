@@ -17,54 +17,52 @@
  * @copyright  (c) 2011 - 2013, Cartalyst LLC
  * @link       http://cartalyst.com
  */
-
 use Illuminate\Database\Migrations\Migration;
 
-class MigrationCartalystSentryInstallUsers extends Migration {
+class MigrationCartalystSentryInstallUsers extends Migration
+{
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('users', function($table)
-		{
-			$table->increments('id');
-			$table->string('username');
-			$table->string('email');
-			$table->string('password');
-			$table->string('photo')->nullable();
-			$table->text('permissions')->nullable();
-			$table->boolean('activated')->default(0);
-			$table->string('activation_code')->nullable();
-			$table->timestamp('activated_at')->nullable();
-			$table->timestamp('last_login')->nullable();
-			$table->string('persist_code')->nullable();
-			$table->string('reset_password_code')->nullable();
-			$table->string('first_name')->nullable();
-			$table->string('last_name')->nullable();
-			$table->timestamp('created_at')->useCurrent();
-			$table->timestamp('updated_at')->nullable();
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('users', function ($table) {
+            $table->increments('id');
+            $table->string('username');
+            $table->string('email');
+            $table->string('password');
+            $table->string('photo')->nullable();
+            $table->text('permissions')->nullable();
+            $table->boolean('activated')->default(0);
+            $table->string('activation_code')->nullable();
+            $table->timestamp('activated_at')->nullable();
+            $table->timestamp('last_login')->nullable();
+            $table->string('persist_code')->nullable();
+            $table->string('reset_password_code')->nullable();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable();
+            // We'll need to ensure that MySQL uses the InnoDB engine to
+            // support the indexes, other engines aren't affected.
+            $table->engine = 'InnoDB';
+            $table->unique('username');
+            $table->index('activation_code');
+            $table->index('reset_password_code');
+        });
+    }
 
-			// We'll need to ensure that MySQL uses the InnoDB engine to
-			// support the indexes, other engines aren't affected.
-			$table->engine = 'InnoDB';
-			$table->unique('username');
-			$table->index('activation_code');
-			$table->index('reset_password_code');
-		});
-	}
-
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::drop('users');
-	}
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('users');
+    }
 
 }

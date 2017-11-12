@@ -1,4 +1,5 @@
 <?php namespace Services\Validation;
+
 /*
 =================================================
 CMS Name  :  DOPTOR
@@ -11,7 +12,8 @@ Description :  Doptor is Opensource CMS.
 */
 use Exception;
 
-class ValidationException extends Exception {
+class ValidationException extends Exception
+{
 
     /**
      * Validation errors
@@ -23,15 +25,14 @@ class ValidationException extends Exception {
     /**
      * Constructor
      *
-     * @param MessageBag    $errors
-     * @param string    $message
-     * @param int       $code
+     * @param MessageBag $errors
+     * @param string $message
+     * @param int $code
      * @param Exception $previous
      */
     public function __construct($errors, $message = '', $code = 0, Exception $previous = null)
     {
         $this->errors = $errors;
-
         parent::__construct($message, $code, $previous);
     }
 
